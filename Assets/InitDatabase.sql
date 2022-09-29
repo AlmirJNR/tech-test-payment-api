@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS purchase
 (
     id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     seller_id          UUID REFERENCES seller (id) NOT NULL,
-    purchase_status_id INT REFERENCES purchase_status (id),
+    purchase_status_id SMALLINT REFERENCES purchase_status (id),
     created_at         TIMESTAMP        DEFAULT NOW(),
     updated_at         TIMESTAMP,
     deleted_at         TIMESTAMP
