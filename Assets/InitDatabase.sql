@@ -60,9 +60,9 @@ CREATE TABLE IF NOT EXISTS purchase_product
 ---------------------------
 
 INSERT INTO seller (cpf, name, email, telephone)
-VALUES ('123.456.789-01', 'First seller', 'firstseller@gmail.com', '5531912345678'),
-       ('234.567.890-12', 'Second seller', 'secondseller@gmail.com', '5531923456789'),
-       ('345.678.901-23', 'Third seller', 'thirdseller@gmail.com', '5531934567890');
+VALUES ('123.456.789-01', 'First seller', 'firstseller@gmail.com', '+55(31)91234-5678'),
+       ('234.567.890-12', 'Second seller', 'secondseller@gmail.com', '+55(31)92345-6789'),
+       ('345.678.901-23', 'Third seller', 'thirdseller@gmail.com', '+55(31)93456-7890');
 
 INSERT INTO product (name, amount, price)
 VALUES ('Playstation 5', 100, 4549.99),
