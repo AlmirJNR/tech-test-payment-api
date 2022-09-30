@@ -1,12 +1,28 @@
 using System.Reflection;
 using System.Text;
+using ECommerce.Api.Repositories;
+using ECommerce.Api.Services;
+using ECommerce.Contracts.Interfaces.Repositories;
+using ECommerce.Contracts.Interfaces.Services;
+using ECommerce.Data.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddDbContext<EcommerceContext>(options =>
+    options.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING")
+                      ?? throw new ArgumentException("Missing DATABASE_CONNECTION_STRING variable")));
+// Repositories
+builder.Services.AddTransient<ISellerRepository, SellerRepository>();
+
+// Services
+builder.Services.AddTransient<ISellerService, SellerService>();
+builder.Services.AddTransient<ILoginService, LoginService>();
+
+// Controllers
 builder.Services.AddControllers();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -22,7 +38,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(
                 Environment.GetEnvironmentVariable("JWT_KEY")
-                ?? throw new Exception("Unable to find JWT_KEY variable")))
+                ?? throw new ArgumentException("Missing JWT_KEY variable")))
     };
 });
 
