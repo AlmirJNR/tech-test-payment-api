@@ -9,7 +9,9 @@
       "applicationUrl": "http://localhost:5182",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "JWT_ISSUER": "JWT_ECOMMERCE",
+        "DATABASE_CONNECTION_STRING": "Server=localhost;Port=5432;Database=ecommerce;User Id=admin;Password=admin-password;",
+        "JWT_SUBJECT": "ECOMMERCE_SUBJECT",
+        "JWT_ISSUER": "ECOMMERCE_ISSUER",
         "JWT_AUDIENCE": "ECOMMERCE_AUDIENCE",
         "JWT_KEY": "9a5835502c69a59d42d5438316d3d43cd2fb0bdd789b3de98f1d0d58e25dbaa5"
       }
