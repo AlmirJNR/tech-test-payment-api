@@ -123,10 +123,10 @@ public class SellerController : ControllerBase
         if (requestingSellerId != sellerId)
             return Unauthorized();
 
-        if (string.IsNullOrWhiteSpace(sellerDto.Cpf) &&
-            string.IsNullOrWhiteSpace(sellerDto.Name) &&
-            string.IsNullOrWhiteSpace(sellerDto.Email) &&
-            string.IsNullOrWhiteSpace(sellerDto.Telephone))
+        if (string.IsNullOrWhiteSpace(sellerDto.Cpf)
+            && string.IsNullOrWhiteSpace(sellerDto.Name)
+            && string.IsNullOrWhiteSpace(sellerDto.Email)
+            && string.IsNullOrWhiteSpace(sellerDto.Telephone))
             return BadRequest("Nothing to update");
 
         if (!string.IsNullOrWhiteSpace(sellerDto.Cpf) && !RegexHelper.IsCpfValid(sellerDto.Cpf))
