@@ -1,5 +1,4 @@
 using System.Net;
-using ECommerce.Contracts.Dtos.Jwt;
 using ECommerce.Contracts.Dtos.Seller;
 using ECommerce.Contracts.Interfaces.Repositories;
 using ECommerce.Contracts.Interfaces.Services;
@@ -18,7 +17,6 @@ public class SellerService : ISellerService
     public async Task<(SellerDto?, HttpStatusCode)> CreateSeller(CreateSellerDto sellerDto)
     {
         var (sellerModel, statusCode) = await _sellerRepository.CreateSeller(sellerDto.ToModel());
-
         if (sellerModel is null)
             return (null, statusCode);
 
@@ -31,7 +29,6 @@ public class SellerService : ISellerService
     public async Task<(SellerDto?, HttpStatusCode)> GetSellerById(Guid sellerId)
     {
         var (sellerModel, statusCode) = await _sellerRepository.GetSellerById(sellerId);
-
         if (sellerModel is null)
             return (null, statusCode);
 
