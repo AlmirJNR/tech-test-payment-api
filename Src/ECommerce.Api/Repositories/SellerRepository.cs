@@ -19,7 +19,11 @@ public class SellerRepository : ISellerRepository
 
     public async Task<(Seller?, HttpStatusCode)> CreateSeller(Seller sellerModel)
     {
-        var exists = await _sellersEntity.FirstOrDefaultAsync(s => s.Cpf == sellerModel.Cpf || s.Email == sellerModel.Email);
+        var exists = await _sellersEntity.FirstOrDefaultAsync(s =>
+            s.Cpf == sellerModel.Cpf
+            || s.Email == sellerModel.Email
+            || s.Telephone == sellerModel.Telephone);
+
         if (exists is not null)
             return (null, HttpStatusCode.Conflict);
 
