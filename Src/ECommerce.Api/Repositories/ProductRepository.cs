@@ -14,7 +14,7 @@ public class ProductRepository : IProductRepository
     public ProductRepository(EcommerceContext dbContext)
     {
         _dbContext = dbContext;
-        _productsEntity = dbContext.Products;
+        _productsEntity = _dbContext.Products;
     }
 
     public async Task<(Product?, HttpStatusCode)> CreateProduct(Product productModel)

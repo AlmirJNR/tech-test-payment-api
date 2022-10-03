@@ -11,9 +11,9 @@ public class SellerRepository : ISellerRepository
     private readonly EcommerceContext _dbContext;
     private readonly DbSet<Seller> _sellersEntity;
 
-    public SellerRepository(EcommerceContext ecommerceContext)
+    public SellerRepository(EcommerceContext dbContext)
     {
-        _dbContext = ecommerceContext;
+        _dbContext = dbContext;
         _sellersEntity = _dbContext.Sellers;
     }
 
