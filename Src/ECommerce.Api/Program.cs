@@ -17,10 +17,12 @@ builder.Services.AddDbContext<EcommerceContext>(options =>
                       ?? throw new ArgumentException("Missing DATABASE_CONNECTION_STRING variable")));
 // Repositories
 builder.Services.AddTransient<ISellerRepository, SellerRepository>();
+builder.Services.AddTransient<IProductRepository, ProductRepository>();
 
 // Services
-builder.Services.AddTransient<ISellerService, SellerService>();
 builder.Services.AddTransient<ILoginService, LoginService>();
+builder.Services.AddTransient<ISellerService, SellerService>();
+builder.Services.AddTransient<IProductService, ProductService>();
 
 // Controllers
 builder.Services.AddControllers();
