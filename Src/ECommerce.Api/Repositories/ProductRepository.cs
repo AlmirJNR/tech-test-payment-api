@@ -33,7 +33,8 @@ public class ProductRepository : IProductRepository
 
     public async Task<HttpStatusCode> DeleteProduct(Guid productId)
     {
-        var productEntity = await _productsEntity.FirstOrDefaultAsync(p => p.Id == productId);
+        var productEntity = await _productsEntity.FirstOrDefaultAsync(p => p.Id == productId
+                                                                           && p.DeletedAt == null);
         if (productEntity is null)
             return HttpStatusCode.NotFound;
 
@@ -49,7 +50,8 @@ public class ProductRepository : IProductRepository
 
     public async Task<(Product?, HttpStatusCode)> GetProductById(Guid productId)
     {
-        var productEntity = await _productsEntity.FirstOrDefaultAsync(p => p.Id == productId);
+        var productEntity = await _productsEntity.FirstOrDefaultAsync(p => p.Id == productId
+                                                                           && p.DeletedAt == null);
 
         return productEntity is null
             ? (null, HttpStatusCode.NotFound)
@@ -58,7 +60,8 @@ public class ProductRepository : IProductRepository
 
     public async Task<HttpStatusCode> UpdateProduct(Product productModel)
     {
-        var productEntity = await _productsEntity.FirstOrDefaultAsync(p => p.Id == productModel.Id);
+        var productEntity = await _productsEntity.FirstOrDefaultAsync(p => p.Id == productModel.Id
+                                                                           && p.DeletedAt == null);
         if (productEntity is null)
             return HttpStatusCode.NotFound;
 

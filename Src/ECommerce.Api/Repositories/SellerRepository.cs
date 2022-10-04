@@ -19,11 +19,9 @@ public class SellerRepository : ISellerRepository
 
     public async Task<(Seller?, HttpStatusCode)> CreateSeller(Seller sellerModel)
     {
-        var exists = await _sellersEntity.FirstOrDefaultAsync(s =>
-            s.Cpf == sellerModel.Cpf
-            || s.Email == sellerModel.Email
-            || s.Telephone == sellerModel.Telephone);
-
+        var exists = await _sellersEntity.FirstOrDefaultAsync(s => s.Cpf == sellerModel.Cpf
+                                                                   || s.Email == sellerModel.Email
+                                                                   || s.Telephone == sellerModel.Telephone);
         if (exists is not null)
             return (null, HttpStatusCode.Conflict);
 
@@ -37,7 +35,8 @@ public class SellerRepository : ISellerRepository
 
     public async Task<HttpStatusCode> DeleteSeller(Guid sellerId)
     {
-        var sellerEntity = await _sellersEntity.FirstOrDefaultAsync(s => s.Id == sellerId);
+        var sellerEntity = await _sellersEntity.FirstOrDefaultAsync(s => s.Id == sellerId
+                                                                         && s.DeletedAt == null);
         if (sellerEntity is null)
             return HttpStatusCode.NotFound;
 
@@ -53,7 +52,8 @@ public class SellerRepository : ISellerRepository
 
     public async Task<(Seller?, HttpStatusCode)> GetSellerById(Guid sellerId)
     {
-        var sellerEntity = await _sellersEntity.FirstOrDefaultAsync(s => s.Id == sellerId);
+        var sellerEntity = await _sellersEntity.FirstOrDefaultAsync(s => s.Id == sellerId
+                                                                         && s.DeletedAt == null);
 
         return sellerEntity is null
             ? (null, HttpStatusCode.NotFound)
@@ -62,7 +62,9 @@ public class SellerRepository : ISellerRepository
 
     public async Task<(Seller?, HttpStatusCode)> SellerLogin(string cpf, string email)
     {
-        var sellerEntity = await _sellersEntity.FirstOrDefaultAsync(s => s.Cpf == cpf && s.Email == email);
+        var sellerEntity = await _sellersEntity.FirstOrDefaultAsync(s => s.Cpf == cpf
+                                                                         && s.Email == email
+                                                                         && s.DeletedAt == null);
 
         return sellerEntity is null
             ? (null, HttpStatusCode.Forbidden)
@@ -71,7 +73,8 @@ public class SellerRepository : ISellerRepository
 
     public async Task<HttpStatusCode> UpdateSeller(Seller sellerModel)
     {
-        var sellerEntity = await _sellersEntity.FirstOrDefaultAsync(s => s.Id == sellerModel.Id);
+        var sellerEntity = await _sellersEntity.FirstOrDefaultAsync(s => s.Id == sellerModel.Id
+                                                                         && s.DeletedAt == null);
         if (sellerEntity is null)
             return HttpStatusCode.NotFound;
 
