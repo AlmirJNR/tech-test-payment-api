@@ -18,11 +18,13 @@ builder.Services.AddDbContext<EcommerceContext>(options =>
 // Repositories
 builder.Services.AddTransient<ISellerRepository, SellerRepository>();
 builder.Services.AddTransient<IProductRepository, ProductRepository>();
+builder.Services.AddTransient<IPurchaseRepository, PurchaseRepository>();
 
 // Services
 builder.Services.AddTransient<ILoginService, LoginService>();
 builder.Services.AddTransient<ISellerService, SellerService>();
 builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IPurchaseService, PurchaseService>();
 
 // Controllers
 builder.Services.AddControllers();
