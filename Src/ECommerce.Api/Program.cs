@@ -43,9 +43,13 @@ builder.Services
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+            ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
+                          ?? throw new ArgumentException("Missing JWT_ISSUER variable"),
+
             ValidateAudience = true,
-            ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+            ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+                            ?? throw new ArgumentException("Missing JWT_AUDIENCE variable"),
+
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(
                     Environment.GetEnvironmentVariable("JWT_KEY")
