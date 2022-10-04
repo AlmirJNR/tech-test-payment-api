@@ -1,6 +1,6 @@
 namespace ECommerce.Contracts.Enums;
 
-public enum PurchaseStatusEnum
+public enum PurchaseStatusEnum : short
 {
     WaitingPayment = 100,
     PaymentApproved = 200,
