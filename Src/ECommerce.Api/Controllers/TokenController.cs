@@ -34,8 +34,8 @@ public class TokenController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(loginDto.Cpf) ||
             string.IsNullOrWhiteSpace(loginDto.Email) ||
-            !RegexHelper.IsCpfValid(loginDto.Cpf) ||
-            !RegexHelper.IsEmailValid(loginDto.Email))
+            !RegexUtil.IsCpfValid(loginDto.Cpf) ||
+            !RegexUtil.IsEmailValid(loginDto.Email))
             return BadRequest();
 
         var (loggedSeller, _) = await _loginService.SellerLogin(loginDto);

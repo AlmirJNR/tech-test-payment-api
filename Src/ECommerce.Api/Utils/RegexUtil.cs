@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace ECommerce.Api.Utils;
 
-public static class RegexHelper
+public static class RegexUtil
 {
     private static readonly Regex CpfRegex = new(@"[0-9]{3}\.[0-9]{3}\.[0-9]{3}\-[0-9]{2}");
     private static readonly Regex EmailRegex = new(@"[\w0-9]+\@[\w0-9]+(?:\.[\w]+)+$");

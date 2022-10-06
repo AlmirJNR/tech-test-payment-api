@@ -32,13 +32,13 @@ public class SellerController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateSeller([FromBody] CreateSellerDto sellerDto)
     {
-        if (string.IsNullOrWhiteSpace(sellerDto.Cpf) || !RegexHelper.IsCpfValid(sellerDto.Cpf))
+        if (string.IsNullOrWhiteSpace(sellerDto.Cpf) || !RegexUtil.IsCpfValid(sellerDto.Cpf))
             return BadRequest("Invalid Cpf");
         if (string.IsNullOrWhiteSpace(sellerDto.Name) || sellerDto.Name.Length < 3)
             return BadRequest("Invalid Name");
-        if (string.IsNullOrWhiteSpace(sellerDto.Email) || !RegexHelper.IsEmailValid(sellerDto.Email))
+        if (string.IsNullOrWhiteSpace(sellerDto.Email) || !RegexUtil.IsEmailValid(sellerDto.Email))
             return BadRequest("Invalid Email");
-        if (string.IsNullOrWhiteSpace(sellerDto.Telephone) || !RegexHelper.IsTelephoneValid(sellerDto.Telephone))
+        if (string.IsNullOrWhiteSpace(sellerDto.Telephone) || !RegexUtil.IsTelephoneValid(sellerDto.Telephone))
             return BadRequest("Invalid Telephone");
 
         var (createdSeller, statusCode) = await _sellerService.CreateSeller(sellerDto);
@@ -60,8 +60,8 @@ public class SellerController : ControllerBase
     [HttpDelete("{sellerId:Guid}")]
     public async Task<IActionResult> DeleteSeller([FromRoute] Guid sellerId)
     {
-        var claimsDictionary = JwtHelper.ClaimsToDictionary(User.Claims);
-        var requestingSellerId = JwtHelper.GetSellerGuid(claimsDictionary);
+        var claimsDictionary = JwtUtil.ClaimsToDictionary(User.Claims);
+        var requestingSellerId = JwtUtil.GetSellerGuid(claimsDictionary);
         if (requestingSellerId is null)
             return BadRequest();
 
@@ -87,8 +87,8 @@ public class SellerController : ControllerBase
     [ProducesResponseType(typeof(SellerDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSellerById([FromRoute] Guid sellerId)
     {
-        var claimsDictionary = JwtHelper.ClaimsToDictionary(User.Claims);
-        var requestingSellerId = JwtHelper.GetSellerGuid(claimsDictionary);
+        var claimsDictionary = JwtUtil.ClaimsToDictionary(User.Claims);
+        var requestingSellerId = JwtUtil.GetSellerGuid(claimsDictionary);
         if (requestingSellerId is null)
             return BadRequest();
 
@@ -115,8 +115,8 @@ public class SellerController : ControllerBase
     [HttpPut("{sellerId:Guid}")]
     public async Task<IActionResult> UpdateSeller([FromRoute] Guid sellerId, [FromBody] UpdateSellerDto sellerDto)
     {
-        var claimsDictionary = JwtHelper.ClaimsToDictionary(User.Claims);
-        var requestingSellerId = JwtHelper.GetSellerGuid(claimsDictionary);
+        var claimsDictionary = JwtUtil.ClaimsToDictionary(User.Claims);
+        var requestingSellerId = JwtUtil.GetSellerGuid(claimsDictionary);
         if (requestingSellerId is null)
             return BadRequest();
 
@@ -129,13 +129,13 @@ public class SellerController : ControllerBase
             && string.IsNullOrWhiteSpace(sellerDto.Telephone))
             return BadRequest("Nothing to update");
 
-        if (!string.IsNullOrWhiteSpace(sellerDto.Cpf) && !RegexHelper.IsCpfValid(sellerDto.Cpf))
+        if (!string.IsNullOrWhiteSpace(sellerDto.Cpf) && !RegexUtil.IsCpfValid(sellerDto.Cpf))
             return BadRequest("Invalid Cpf");
         if (!string.IsNullOrWhiteSpace(sellerDto.Name) && sellerDto.Name.Length < 3)
             return BadRequest("Invalid Name");
-        if (!string.IsNullOrWhiteSpace(sellerDto.Email) && !RegexHelper.IsEmailValid(sellerDto.Email))
+        if (!string.IsNullOrWhiteSpace(sellerDto.Email) && !RegexUtil.IsEmailValid(sellerDto.Email))
             return BadRequest("Invalid Email");
-        if (!string.IsNullOrWhiteSpace(sellerDto.Telephone) && !RegexHelper.IsTelephoneValid(sellerDto.Telephone))
+        if (!string.IsNullOrWhiteSpace(sellerDto.Telephone) && !RegexUtil.IsTelephoneValid(sellerDto.Telephone))
             return BadRequest("Invalid Telephone");
 
         var statusCode = await _sellerService.UpdateSeller(sellerId, sellerDto);
