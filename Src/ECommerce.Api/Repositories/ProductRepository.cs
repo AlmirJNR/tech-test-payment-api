@@ -19,7 +19,8 @@ public class ProductRepository : IProductRepository
 
     public async Task<(Product?, HttpStatusCode)> CreateProduct(Product productModel)
     {
-        var exists = await _productsEntity.FirstOrDefaultAsync(p => p.Name == productModel.Name);
+        var exists = await _productsEntity
+            .FirstOrDefaultAsync(p => p.Name == productModel.Name);
         if (exists is not null)
             return (null, HttpStatusCode.Conflict);
 
@@ -33,8 +34,10 @@ public class ProductRepository : IProductRepository
 
     public async Task<HttpStatusCode> DeleteProduct(Guid productId)
     {
-        var productEntity = await _productsEntity.FirstOrDefaultAsync(p => p.Id == productId
-                                                                           && p.DeletedAt == null);
+        var productEntity = await _productsEntity
+            .FirstOrDefaultAsync(p =>
+                p.Id == productId
+                && p.DeletedAt == null);
         if (productEntity is null)
             return HttpStatusCode.NotFound;
 
@@ -50,8 +53,10 @@ public class ProductRepository : IProductRepository
 
     public async Task<(Product?, HttpStatusCode)> GetProductById(Guid productId)
     {
-        var productEntity = await _productsEntity.FirstOrDefaultAsync(p => p.Id == productId
-                                                                           && p.DeletedAt == null);
+        var productEntity = await _productsEntity
+            .FirstOrDefaultAsync(p =>
+                p.Id == productId
+                && p.DeletedAt == null);
 
         return productEntity is null
             ? (null, HttpStatusCode.NotFound)
@@ -60,8 +65,10 @@ public class ProductRepository : IProductRepository
 
     public async Task<HttpStatusCode> UpdateProduct(Product productModel)
     {
-        var productEntity = await _productsEntity.FirstOrDefaultAsync(p => p.Id == productModel.Id
-                                                                           && p.DeletedAt == null);
+        var productEntity = await _productsEntity
+            .FirstOrDefaultAsync(p =>
+                p.Id == productModel.Id
+                && p.DeletedAt == null);
         if (productEntity is null)
             return HttpStatusCode.NotFound;
 
@@ -77,8 +84,11 @@ public class ProductRepository : IProductRepository
         _productsEntity.Update(productEntity);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
-        return savedChanges != 1
-            ? HttpStatusCode.InternalServerError
-            : HttpStatusCode.OK;
+        return savedChanges switch
+        {
+            0 => HttpStatusCode.NotModified,
+            1 => HttpStatusCode.OK,
+            _ => HttpStatusCode.InternalServerError
+        };
     }
 }

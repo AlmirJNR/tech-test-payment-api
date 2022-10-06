@@ -30,7 +30,9 @@ public class PurchaseRepository : IPurchaseRepository
     public async Task<HttpStatusCode> DeletePurchase(Guid purchaseId)
     {
         var purchaseEntity = await _purchasesEntity
-            .FirstOrDefaultAsync(p => p.Id == purchaseId && p.DeletedAt == null);
+            .FirstOrDefaultAsync(p =>
+                p.Id == purchaseId
+                && p.DeletedAt == null);
         if (purchaseEntity is null)
             return HttpStatusCode.NotFound;
 
@@ -46,7 +48,10 @@ public class PurchaseRepository : IPurchaseRepository
 
     public async Task<(Purchase?, HttpStatusCode)> GetPurchaseById(Guid purchaseId)
     {
-        var purchaseEntity = await _purchasesEntity.FirstOrDefaultAsync(p => p.Id == purchaseId && p.DeletedAt == null);
+        var purchaseEntity = await _purchasesEntity
+            .FirstOrDefaultAsync(p =>
+                p.Id == purchaseId
+                && p.DeletedAt == null);
 
         return purchaseEntity is null
             ? (null, HttpStatusCode.NotFound)
@@ -56,7 +61,9 @@ public class PurchaseRepository : IPurchaseRepository
     public async Task<HttpStatusCode> UpdatePurchase(Purchase purchaseModel)
     {
         var purchaseEntity = await _purchasesEntity
-            .FirstOrDefaultAsync(p => p.Id == purchaseModel.Id && p.DeletedAt == null);
+            .FirstOrDefaultAsync(p =>
+                p.Id == purchaseModel.Id
+                && p.DeletedAt == null);
         if (purchaseEntity is null)
             return HttpStatusCode.NotFound;
 
@@ -69,8 +76,11 @@ public class PurchaseRepository : IPurchaseRepository
         _purchasesEntity.Update(purchaseModel);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
-        return savedChanges != 1
-            ? HttpStatusCode.InternalServerError
-            : HttpStatusCode.OK;
+        return savedChanges switch
+        {
+            0 => HttpStatusCode.NotModified,
+            1 => HttpStatusCode.OK,
+            _ => HttpStatusCode.InternalServerError
+        };
     }
 }
