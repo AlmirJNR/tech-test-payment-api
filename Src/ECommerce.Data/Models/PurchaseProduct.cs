@@ -9,7 +9,7 @@
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
-        public virtual Seller Product { get; set; } = null!;
+        public virtual Product Product { get; set; } = null!;
         public virtual Purchase Purchase { get; set; } = null!;
     }
 }

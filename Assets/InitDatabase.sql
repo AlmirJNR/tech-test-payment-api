@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS purchase
 CREATE TABLE IF NOT EXISTS purchase_product
 (
     purchase_id    UUID REFERENCES purchase (id) NOT NULL,
-    product_id     UUID REFERENCES seller (id)   NOT NULL,
+    product_id     UUID REFERENCES product (id)   NOT NULL,
     product_amount SMALLINT  DEFAULT 1,
     created_at     TIMESTAMP DEFAULT NOW(),
     updated_at     TIMESTAMP,

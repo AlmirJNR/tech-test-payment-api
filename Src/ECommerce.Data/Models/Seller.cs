@@ -4,7 +4,6 @@
     {
         public Seller()
         {
-            PurchaseProducts = new HashSet<PurchaseProduct>();
             Purchases = new HashSet<Purchase>();
         }
 
@@ -17,7 +16,6 @@
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
-        public virtual ICollection<PurchaseProduct> PurchaseProducts { get; set; }
         public virtual ICollection<Purchase> Purchases { get; set; }
     }
 }
