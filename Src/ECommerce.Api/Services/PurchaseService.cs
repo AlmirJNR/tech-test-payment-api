@@ -17,9 +17,6 @@ public class PurchaseService : IPurchaseService
     public async Task<(PurchaseDto?, HttpStatusCode)> CreatePurchase(CreatePurchaseDto purchaseDto)
     {
         var (purchaseModel, statusCode) = await _purchaseRepository.CreatePurchase(purchaseDto.ToModel());
-        if (purchaseModel is null)
-            return (null, statusCode);
-
         return (PurchaseDto.FromModel(purchaseModel), statusCode);
     }
 
@@ -29,9 +26,6 @@ public class PurchaseService : IPurchaseService
     public async Task<(PurchaseDto?, HttpStatusCode)> GetPurchaseById(Guid purchaseId)
     {
         var (purchaseModel, statusCode) = await _purchaseRepository.GetPurchaseById(purchaseId);
-        if (purchaseModel is null)
-            return (null, statusCode);
-
         return (PurchaseDto.FromModel(purchaseModel), statusCode);
     }
 

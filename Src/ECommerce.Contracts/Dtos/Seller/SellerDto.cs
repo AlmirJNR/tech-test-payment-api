@@ -10,14 +10,20 @@ public readonly record struct SellerDto()
     public DateTime? CreatedAt { get; init; } = null;
     public DateTime? UpdatedAt { get; init; } = null;
 
-    public static SellerDto FromModel(Data.Models.Seller seller) => new()
+    public static SellerDto? FromModel(Data.Models.Seller? seller)
     {
-        Id = seller.Id,
-        Cpf = seller.Cpf,
-        Name = seller.Name,
-        Email = seller.Email,
-        Telephone = seller.Telephone,
-        CreatedAt = seller.CreatedAt,
-        UpdatedAt = seller.UpdatedAt
-    };
+        if (seller is null)
+            return null;
+
+        return new SellerDto
+        {
+            Id = seller.Id,
+            Cpf = seller.Cpf,
+            Name = seller.Name,
+            Email = seller.Email,
+            Telephone = seller.Telephone,
+            CreatedAt = seller.CreatedAt,
+            UpdatedAt = seller.UpdatedAt
+        };
+    }
 };

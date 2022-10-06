@@ -17,9 +17,6 @@ public class SellerService : ISellerService
     public async Task<(SellerDto?, HttpStatusCode)> CreateSeller(CreateSellerDto sellerDto)
     {
         var (sellerModel, statusCode) = await _sellerRepository.CreateSeller(sellerDto.ToModel());
-        if (sellerModel is null)
-            return (null, statusCode);
-
         return (SellerDto.FromModel(sellerModel), statusCode);
     }
 
@@ -29,9 +26,6 @@ public class SellerService : ISellerService
     public async Task<(SellerDto?, HttpStatusCode)> GetSellerById(Guid sellerId)
     {
         var (sellerModel, statusCode) = await _sellerRepository.GetSellerById(sellerId);
-        if (sellerModel is null)
-            return (null, statusCode);
-
         return (SellerDto.FromModel(sellerModel), statusCode);
     }
 

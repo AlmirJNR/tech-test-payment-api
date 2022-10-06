@@ -9,13 +9,19 @@ public readonly record struct ProductDto()
     public DateTime? CreatedAt { get; init; } = null;
     public DateTime? UpdatedAt { get; init; } = null;
 
-    public static ProductDto FromModel(Data.Models.Product productModel) => new()
+    public static ProductDto? FromModel(Data.Models.Product? productModel)
     {
-        Id = productModel.Id,
-        Name = productModel.Name,
-        Amount = productModel.Amount,
-        Price = productModel.Price,
-        CreatedAt = productModel.CreatedAt,
-        UpdatedAt = productModel.UpdatedAt
-    };
+        if (productModel is null)
+            return null;
+
+        return new ProductDto
+        {
+            Id = productModel.Id,
+            Name = productModel.Name,
+            Amount = productModel.Amount,
+            Price = productModel.Price,
+            CreatedAt = productModel.CreatedAt,
+            UpdatedAt = productModel.UpdatedAt
+        };
+    }
 }

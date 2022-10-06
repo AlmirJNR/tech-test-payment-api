@@ -10,12 +10,18 @@ public readonly record struct PurchaseDto()
     public DateTime? CreatedAt { get; init; } = null;
     public DateTime? UpdatedAt { get; init; } = null;
 
-    public static PurchaseDto FromModel(Data.Models.Purchase purchaseModel) => new()
+    public static PurchaseDto? FromModel(Data.Models.Purchase? purchaseModel)
     {
-        Id = purchaseModel.Id,
-        SellerId = purchaseModel.SellerId,
-        PurchaseStatusId = (PurchaseStatusEnum?)purchaseModel.PurchaseStatusId,
-        CreatedAt = purchaseModel.CreatedAt,
-        UpdatedAt = purchaseModel.UpdatedAt
-    };
+        if (purchaseModel is null)
+            return null;
+
+        return new PurchaseDto
+        {
+            Id = purchaseModel.Id,
+            SellerId = purchaseModel.SellerId,
+            PurchaseStatusId = (PurchaseStatusEnum?)purchaseModel.PurchaseStatusId,
+            CreatedAt = purchaseModel.CreatedAt,
+            UpdatedAt = purchaseModel.UpdatedAt
+        };
+    }
 }

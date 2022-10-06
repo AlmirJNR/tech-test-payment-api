@@ -17,9 +17,6 @@ public class ProductService : IProductService
     public async Task<(ProductDto?, HttpStatusCode)> CreateProduct(CreateProductDto productDto)
     {
         var (productModel, statusCode) = await _productRepository.CreateProduct(productDto.ToModel());
-        if (productModel is null)
-            return (null, statusCode);
-
         return (ProductDto.FromModel(productModel), statusCode);
     }
 
@@ -29,9 +26,6 @@ public class ProductService : IProductService
     public async Task<(ProductDto?, HttpStatusCode)> GetProductById(Guid productId)
     {
         var (productModel, statusCode) = await _productRepository.GetProductById(productId);
-        if (productModel is null)
-            return (null, statusCode);
-
         return (ProductDto.FromModel(productModel), statusCode);
     }
 
