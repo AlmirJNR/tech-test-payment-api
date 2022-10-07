@@ -9,7 +9,7 @@
       "applicationUrl": "http://localhost:5182",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "DATABASE_CONNECTION_STRING": "Server=localhost;Port=5432;Database=ecommerce;User Id=admin;Password=admin-password;",
+        "DATABASE_CONNECTION_STRING": "Server=127.0.0.1;Port=5432;Database=ecommerce-Test;User Id=admin;Password=admin-password;",
         "JWT_SUBJECT": "ECOMMERCE_SUBJECT",
         "JWT_ISSUER": "ECOMMERCE_ISSUER",
         "JWT_AUDIENCE": "ECOMMERCE_AUDIENCE",

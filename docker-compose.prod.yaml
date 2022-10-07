@@ -1,41 +1,20 @@
 version: "3.9"
 
 volumes:
-  homologation-database:
+  database:
     driver: "local"
-  production-database:
-    driver: "local"
-  production-api:
+  api:
     driver: "local"
 
 networks:
-  homologation:
-    driver: "bridge"
-  production:
+  backend:
     driver: "bridge"
 
 services:
-  homologation-database:
+  database:
     build:
       context: ./Assets
-      dockerfile: Database.Dockerfile
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U admin -d ecommerce" ]
-      interval: 3s
-      timeout: 5s
-      retries: 5
-    environment:
-      POSTGRES_DB: ecommerce
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin-password
-    restart: unless-stopped
-    volumes:
-      - homologation-database:/var/lib/postgresql/data
-
-  production-database:
-    build:
-      context: ./Assets
-      dockerfile: Database.Dockerfile
+      dockerfile: Database.prod.Dockerfile
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U admin -d ecommerce" ]
       interval: 3s
@@ -49,17 +28,16 @@ services:
       - "5432:5432"
     restart: unless-stopped
     volumes:
-      - production-database:/var/lib/postgresql/data
+      - database:/var/lib/postgresql/data
     networks:
-      - production
+      - backend
 
   api:
     build:
       context: .
-      dockerfile: ./Assets/Api.Dockerfile
+      dockerfile: ./Assets/Api.prod.Dockerfile
     environment:
-      HOMOLOGATION_DATABASE_CONNECTION_STRING: "Server=homologation-database;Port=5432;Database=ecommerce;User Id=admin;Password=admin-password;"
-      DATABASE_CONNECTION_STRING: "Server=production-database;Port=5432;Database=ecommerce;User Id=admin;Password=admin-password;"
+      DATABASE_CONNECTION_STRING: "Server=database;Port=5432;Database=ecommerce;User Id=admin;Password=admin-password;"
       JWT_SUBJECT: "ECOMMERCE_SUBJECT"
       JWT_ISSUER: "ECOMMERCE_ISSUER"
       JWT_AUDIENCE: "ECOMMERCE_BACKEND"
@@ -71,6 +49,6 @@ services:
       database:
         condition: service_healthy
     volumes:
-      - production-api:/Api
+      - api:/Api
     networks:
-      - production
+      - backend

@@ -1,0 +1,33 @@
+version: "3.9"
+
+volumes:
+  api:
+    driver: "local"
+
+services:
+  database:
+    build:
+      context: ./Assets
+      dockerfile: Database.Dockerfile
+    environment:
+      POSTGRES_DB: ecommerce-Test
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin-password
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: ./Assets/Api.Dockerfile
+    environment:
+      JWT_SUBJECT: "ECOMMERCE_SUBJECT"
+      JWT_ISSUER: "ECOMMERCE_ISSUER"
+      JWT_AUDIENCE: "ECOMMERCE_BACKEND"
+      JWT_KEY: "9a5835502c69a59d42d5438316d3d43cd2fb0bdd789b3de98f1d0d58e25dbaa5"
+    ports:
+      - "5182:80"
+    restart: unless-stopped
+    volumes:
+      - api:/Api
