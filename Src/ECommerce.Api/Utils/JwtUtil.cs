@@ -12,6 +12,8 @@ public static class JwtUtil
         claimsDictionary.TryGetValue("sellerId", out var sellerId);
         Guid.TryParse(sellerId, out var sellerGuid);
 
-        return sellerGuid;
+        return sellerGuid == Guid.Empty
+            ? null
+            : sellerGuid;
     }
 }
