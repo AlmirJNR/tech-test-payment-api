@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using ECommerce.Api.Utils;
 using ECommerce.Contracts.Dtos.Seller;
 using ECommerce.Contracts.Interfaces.Services;
@@ -16,10 +17,14 @@ namespace ECommerce.Api.Controllers;
 public class SellerController : ControllerBase
 {
     private readonly ISellerService _sellerService;
+    private readonly IEnumerable<Claim> _claims;
 
-    public SellerController(ISellerService sellerService)
+    public SellerController(ISellerService sellerService, IEnumerable<Claim>? claims = null)
     {
         _sellerService = sellerService;
+        
+        // DOT NOT REMOVE USER NULLABLE CHECK
+        _claims = claims ?? User?.Claims ?? Array.Empty<Claim>();
     }
 
     /// <summary>
@@ -60,7 +65,7 @@ public class SellerController : ControllerBase
     [HttpDelete("{sellerId:Guid}")]
     public async Task<IActionResult> DeleteSeller([FromRoute] Guid sellerId)
     {
-        var claimsDictionary = JwtUtil.ClaimsToDictionary(User.Claims);
+        var claimsDictionary = JwtUtil.ClaimsToDictionary(_claims);
         var requestingSellerId = JwtUtil.GetSellerGuid(claimsDictionary);
         if (requestingSellerId is null)
             return BadRequest();
@@ -87,7 +92,7 @@ public class SellerController : ControllerBase
     [ProducesResponseType(typeof(SellerDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSellerById([FromRoute] Guid sellerId)
     {
-        var claimsDictionary = JwtUtil.ClaimsToDictionary(User.Claims);
+        var claimsDictionary = JwtUtil.ClaimsToDictionary(_claims);
         var requestingSellerId = JwtUtil.GetSellerGuid(claimsDictionary);
         if (requestingSellerId is null)
             return BadRequest();
@@ -115,7 +120,7 @@ public class SellerController : ControllerBase
     [HttpPut("{sellerId:Guid}")]
     public async Task<IActionResult> UpdateSeller([FromRoute] Guid sellerId, [FromBody] UpdateSellerDto sellerDto)
     {
-        var claimsDictionary = JwtUtil.ClaimsToDictionary(User.Claims);
+        var claimsDictionary = JwtUtil.ClaimsToDictionary(_claims);
         var requestingSellerId = JwtUtil.GetSellerGuid(claimsDictionary);
         if (requestingSellerId is null)
             return BadRequest();
