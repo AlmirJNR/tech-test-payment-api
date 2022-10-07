@@ -21,15 +21,13 @@ public class TokenController : ControllerBase
         _loginService = loginService;
     }
 
-    private readonly record struct JwtAsJson(string Jwt);
-
     /// <summary>
     /// Creates a Jwt with seller id.
     /// </summary>
     /// <response code="400">Bad request</response>
     /// <exception cref="ArgumentException"></exception>
     [HttpPost]
-    [ProducesResponseType(typeof(JwtAsJson), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
     public async Task<IActionResult> GenerateJwt([FromBody] LoginDto loginDto)
     {
         if (string.IsNullOrWhiteSpace(loginDto.Cpf) ||
@@ -66,6 +64,6 @@ public class TokenController : ControllerBase
             signingCredentials: credentials);
 
         var serializedToken = new JwtSecurityTokenHandler().WriteToken(token);
-        return Created(string.Empty, new JwtAsJson(serializedToken ?? string.Empty));
+        return Created(string.Empty, serializedToken);
     }
 }
