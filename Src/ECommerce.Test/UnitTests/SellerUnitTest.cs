@@ -17,9 +17,9 @@ using Xunit;
 
 namespace ECommerce.Test.UnitTests;
 
-public class UnitTestRepositories
+public class SellerUnitTest
 {
-    public UnitTestRepositories() => EnvironmentUtils.SetEnvironmentVariables();
+    public SellerUnitTest() => EnvironmentUtils.SetEnvironmentVariables();
 
     [Theory]
     [InlineData(

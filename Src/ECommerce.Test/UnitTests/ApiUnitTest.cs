@@ -4,7 +4,7 @@ using Xunit;
 
 namespace ECommerce.Test.UnitTests;
 
-public class Api
+public class ApiUnitTest
 {
     [Fact]
     public void Get_Api_Should_Return_Ok()
