@@ -9,6 +9,7 @@ using ECommerce.Api.Services;
 using ECommerce.Contracts.Dtos.Jwt;
 using ECommerce.Contracts.Dtos.Seller;
 using ECommerce.Data.Context;
+using ECommerce.Test.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -18,17 +19,7 @@ namespace ECommerce.Test.UnitTests;
 
 public class UnitTestRepositories
 {
-    public UnitTestRepositories()
-    {
-        Environment
-            .SetEnvironmentVariable("JWT_SUBJECT", "ECOMMERCE_SUBJECT");
-        Environment
-            .SetEnvironmentVariable("JWT_ISSUER", "ECOMMERCE_ISSUER");
-        Environment
-            .SetEnvironmentVariable("JWT_AUDIENCE", "ECOMMERCE_BACKEND");
-        Environment
-            .SetEnvironmentVariable("JWT_KEY", "9a5835502c69a59d42d5438316d3d43cd2fb0bdd789b3de98f1d0d58e25dbaa5");
-    }
+    public UnitTestRepositories() => EnvironmentUtils.SetEnvironmentVariables();
 
     [Theory]
     [InlineData(
@@ -54,7 +45,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("CreateSellerBadRequest")
+            .UseInMemoryDatabase(nameof(Create_Seller_Should_Return_BadRequest))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -82,7 +73,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("CreateSellerConflict")
+            .UseInMemoryDatabase(nameof(Create_Seller_Should_Return_Conflict))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -133,7 +124,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("CreateSellerCreated")
+            .UseInMemoryDatabase(nameof(Create_Seller_Should_Return_Created))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -169,7 +160,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("DeleteSellerUnauthorized")
+            .UseInMemoryDatabase(nameof(Delete_Seller_Should_Return_Unauthorized))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -224,7 +215,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("DeleteSellerBadRequest")
+            .UseInMemoryDatabase(nameof(Delete_Seller_Should_Return_BadRequest))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -292,7 +283,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("DeleteSellerNotFound")
+            .UseInMemoryDatabase(nameof(Delete_Seller_Should_Return_NotFound))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -348,7 +339,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("DeleteSellerOk")
+            .UseInMemoryDatabase(nameof(Delete_Seller_Should_Return_Ok))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -402,7 +393,7 @@ public class UnitTestRepositories
         string sellerTelephone)
     {
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("GetSellerByIdUnauthorized")
+            .UseInMemoryDatabase(nameof(Get_Seller_By_Id_Should_Return_Unauthorized))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -457,7 +448,7 @@ public class UnitTestRepositories
         string sellerTelephone)
     {
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("GetSellerByIdBadRequest")
+            .UseInMemoryDatabase(nameof(Get_Seller_By_Id_Should_Return_BadRequest))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -525,7 +516,7 @@ public class UnitTestRepositories
         string sellerTelephone)
     {
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("GetSellerByIdNotFound")
+            .UseInMemoryDatabase(nameof(Get_Seller_By_Id_Should_Return_NotFound))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -580,7 +571,7 @@ public class UnitTestRepositories
         string sellerTelephone)
     {
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("GetSellerByIdOk")
+            .UseInMemoryDatabase(nameof(Get_Seller_By_Id_Should_Return_Ok))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -635,7 +626,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("UpdateSellerByIdUnauthorized")
+            .UseInMemoryDatabase(nameof(Update_Seller_By_Id_Should_Return_Unauthorized))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -671,7 +662,7 @@ public class UnitTestRepositories
         {
             Cpf = newSellerCpf,
             Name = newSellerName,
-            Email = newSellerName,
+            Email = newSellerEmail,
             Telephone = newSellerTelephone
         };
 
@@ -680,67 +671,6 @@ public class UnitTestRepositories
 
         // Assert
         Assert.True(actionResult is UnauthorizedResult);
-    }
-
-    [Theory]
-    [InlineData(
-        "123.456.789-01",
-        "johndoe@email.com",
-        "John Doe",
-        "+00(00)12345-6789")]
-    public async void Update_Seller_Values_With_Same_Existing_Values_By_Id_Should_Return_BadRequest(
-        string newSellerCpf,
-        string newSellerEmail,
-        string newSellerName,
-        string newSellerTelephone)
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("UpdateSellerByIdBadRequest")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        var sellerController = new SellerController(sellerService, claims);
-
-        var updateSellerDto = new UpdateSellerDto
-        {
-            Cpf = newSellerCpf,
-            Name = newSellerName,
-            Email = newSellerName,
-            Telephone = newSellerTelephone
-        };
-
-        // Act
-        var actionResult = await sellerController.UpdateSeller(createdSeller?.Id ?? Guid.Empty, updateSellerDto);
-
-        // Assert
-        Assert.True(actionResult is BadRequestObjectResult);
     }
 
     [Theory]
@@ -753,7 +683,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"UpdateSellerCpfByIdBadRequest{newSellerCpf}")
+            .UseInMemoryDatabase($"{nameof(Update_Seller_Cpf_By_Id_Should_Return_BadRequest)}{newSellerCpf}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -806,7 +736,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"UpdateSellerEmailByIdBadRequest{newSellerEmail}")
+            .UseInMemoryDatabase($"{nameof(Update_Seller_Email_By_Id_Should_Return_BadRequest)}{newSellerEmail}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -856,7 +786,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"UpdateSellerNameByIdBadRequest{newSellerName}")
+            .UseInMemoryDatabase($"{nameof(Update_Seller_Name_By_Id_Should_Return_BadRequest)}{newSellerName}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -911,7 +841,8 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"UpdateSellerTelephoneByIdBadRequest{newSellerTelephone}")
+            .UseInMemoryDatabase(
+                $"{nameof(Update_Seller_Telephone_By_Id_Should_Return_BadRequest)}{newSellerTelephone}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -961,7 +892,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("UpdateSellerTelephoneByIdNotFound")
+            .UseInMemoryDatabase($"{nameof(Update_Seller_Any_Value_By_Id_Should_Return_NotFound)}{newSellerTelephone}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -1008,6 +939,67 @@ public class UnitTestRepositories
     }
 
     [Theory]
+    [InlineData(
+        "123.456.789-01",
+        "johndoe@email.com",
+        "John Doe",
+        "+00(00)12345-6789")]
+    public async void Update_Seller_Values_With_Same_Existing_Values_By_Id_Should_Return_Ok(
+        string newSellerCpf,
+        string newSellerEmail,
+        string newSellerName,
+        string newSellerTelephone)
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<EcommerceContext>()
+            .UseInMemoryDatabase(nameof(Update_Seller_Values_With_Same_Existing_Values_By_Id_Should_Return_Ok))
+            .Options;
+        await using var dbContext = new EcommerceContext(options);
+
+        var sellerRepository = new SellerRepository(dbContext);
+        var sellerService = new SellerService(sellerRepository);
+        var sellerControllerToCreateSeller = new SellerController(sellerService);
+
+        var loginService = new LoginService(sellerRepository);
+        var tokenController = new TokenController(loginService);
+
+        var createSellerDto = new CreateSellerDto
+        {
+            Cpf = "123.456.789-01",
+            Email = "johndoe@email.com",
+            Name = "John Doe",
+            Telephone = "+00(00)12345-6789"
+        };
+        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+            ?.Value as SellerDto?;
+
+        var loginDto = new LoginDto
+        {
+            Cpf = createdSeller?.Cpf ?? string.Empty,
+            Email = createdSeller?.Email ?? string.Empty
+        };
+
+        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
+        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
+
+        var sellerController = new SellerController(sellerService, claims);
+
+        var updateSellerDto = new UpdateSellerDto
+        {
+            Cpf = newSellerCpf,
+            Name = newSellerName,
+            Email = newSellerEmail,
+            Telephone = newSellerTelephone
+        };
+
+        // Act
+        var actionResult = await sellerController.UpdateSeller(createdSeller?.Id ?? Guid.Empty, updateSellerDto);
+
+        // Assert
+        Assert.True(actionResult is OkResult);
+    }
+
+    [Theory]
     [InlineData("123.456.789-01")]
     [InlineData("234.567.890-12")]
     [InlineData("345.678.901-23")]
@@ -1015,7 +1007,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"UpdateSellerCpfByIdOk{newSellerCpf}")
+            .UseInMemoryDatabase($"{nameof(Update_Seller_Cpf_By_Id_Should_Return_Ok)}{newSellerCpf}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -1067,7 +1059,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"UpdateSellerEmailByIdOk{newSellerEmail}")
+            .UseInMemoryDatabase($"{nameof(Update_Seller_Email_By_Id_Should_Return_Ok)}{newSellerEmail}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -1119,7 +1111,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"UpdateSellerNameByIdOk{newSellerName}")
+            .UseInMemoryDatabase($"{nameof(Update_Seller_Name_By_Id_Should_Return_Ok)}{newSellerName}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -1171,7 +1163,7 @@ public class UnitTestRepositories
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"UpdateSellerTelephoneByIdOk{newSellerTelephone}")
+            .UseInMemoryDatabase($"{nameof(Update_Seller_Telephone_By_Id_Should_Return_Ok)}{newSellerTelephone}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 

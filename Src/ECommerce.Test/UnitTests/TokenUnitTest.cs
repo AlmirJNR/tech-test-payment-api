@@ -1,10 +1,10 @@
-using System;
 using ECommerce.Api.Controllers;
 using ECommerce.Api.Repositories;
 using ECommerce.Api.Services;
 using ECommerce.Contracts.Dtos.Jwt;
 using ECommerce.Contracts.Dtos.Seller;
 using ECommerce.Data.Context;
+using ECommerce.Test.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -13,13 +13,7 @@ namespace ECommerce.Test.UnitTests;
 
 public class TokenUnitTest
 {
-    public TokenUnitTest()
-    {
-        Environment.SetEnvironmentVariable("JWT_SUBJECT", "ECOMMERCE_SUBJECT");
-        Environment.SetEnvironmentVariable("JWT_ISSUER", "ECOMMERCE_ISSUER");
-        Environment.SetEnvironmentVariable("JWT_AUDIENCE", "ECOMMERCE_BACKEND");
-        Environment.SetEnvironmentVariable("JWT_KEY", "9a5835502c69a59d42d5438316d3d43cd2fb0bdd789b3de98f1d0d58e25dbaa5");
-    }
+    public TokenUnitTest() => EnvironmentUtils.SetEnvironmentVariables();
 
     [Theory]
     [InlineData(
@@ -45,7 +39,7 @@ public class TokenUnitTest
     {
         // Arrange - Shared
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("GenerateTokenBadRequest")
+            .UseInMemoryDatabase(nameof(Generate_Token_Should_Return_BadRequest))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -96,7 +90,7 @@ public class TokenUnitTest
     {
         // Arrange - Shared
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase("GenerateTokenCreated")
+            .UseInMemoryDatabase(nameof(Generate_Token_Should_Return_Created))
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
