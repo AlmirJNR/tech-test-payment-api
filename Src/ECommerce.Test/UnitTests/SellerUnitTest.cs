@@ -170,7 +170,7 @@ public class SellerUnitTest
         var loginService = new LoginService(sellerRepository);
 
         var tokenController = new TokenController(loginService);
-        var sellerControllerToCreate = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var createSellerDto = new CreateSellerDto
         {
@@ -180,7 +180,7 @@ public class SellerUnitTest
             Telephone = sellerTelephone
         };
 
-        var createdSeller = (await sellerControllerToCreate.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -192,7 +192,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         // Act
         var actionResult = await sellerController.DeleteSeller(Guid.NewGuid());
@@ -222,7 +222,7 @@ public class SellerUnitTest
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
 
-        var sellerControllerToCreate = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var createSellerDto = new CreateSellerDto
         {
@@ -232,7 +232,7 @@ public class SellerUnitTest
             Telephone = sellerTelephone
         };
 
-        var createdSeller = (await sellerControllerToCreate.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var claimsArray = new Claim[]
@@ -260,7 +260,7 @@ public class SellerUnitTest
             .ReadJwtToken(new JwtSecurityTokenHandler().WriteToken(encryptedToken))
             .Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         // Act
         var actionResult = await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
@@ -293,7 +293,7 @@ public class SellerUnitTest
         var loginService = new LoginService(sellerRepository);
 
         var tokenController = new TokenController(loginService);
-        var sellerControllerToCreate = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var createSellerDto = new CreateSellerDto
         {
@@ -303,7 +303,7 @@ public class SellerUnitTest
             Telephone = sellerTelephone
         };
 
-        var createdSeller = (await sellerControllerToCreate.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -315,7 +315,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         // Act
         await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
@@ -349,7 +349,7 @@ public class SellerUnitTest
         var loginService = new LoginService(sellerRepository);
 
         var tokenController = new TokenController(loginService);
-        var sellerControllerToCreate = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var createSellerDto = new CreateSellerDto
         {
@@ -359,7 +359,7 @@ public class SellerUnitTest
             Telephone = sellerTelephone
         };
 
-        var createdSeller = (await sellerControllerToCreate.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -371,7 +371,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         // Act
         var actionResult = await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
@@ -403,7 +403,7 @@ public class SellerUnitTest
         var loginService = new LoginService(sellerRepository);
 
         var tokenController = new TokenController(loginService);
-        var sellerControllerToCreate = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var createSellerDto = new CreateSellerDto
         {
@@ -413,7 +413,7 @@ public class SellerUnitTest
             Telephone = sellerTelephone
         };
 
-        var createdSeller = (await sellerControllerToCreate.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -425,7 +425,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         // Act
         await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
@@ -455,7 +455,7 @@ public class SellerUnitTest
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
 
-        var sellerControllerToCreate = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var createSellerDto = new CreateSellerDto
         {
@@ -465,7 +465,7 @@ public class SellerUnitTest
             Telephone = sellerTelephone
         };
 
-        var createdSeller = (await sellerControllerToCreate.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var claimsArray = new Claim[]
@@ -493,7 +493,7 @@ public class SellerUnitTest
             .ReadJwtToken(new JwtSecurityTokenHandler().WriteToken(encryptedToken))
             .Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         // Act
         await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
@@ -526,7 +526,7 @@ public class SellerUnitTest
         var loginService = new LoginService(sellerRepository);
 
         var tokenController = new TokenController(loginService);
-        var sellerControllerToCreate = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var createSellerDto = new CreateSellerDto
         {
@@ -536,7 +536,7 @@ public class SellerUnitTest
             Telephone = sellerTelephone
         };
 
-        var createdSeller = (await sellerControllerToCreate.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -548,7 +548,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         // Act
         await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
@@ -581,7 +581,7 @@ public class SellerUnitTest
         var loginService = new LoginService(sellerRepository);
 
         var tokenController = new TokenController(loginService);
-        var sellerControllerToCreate = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var createSellerDto = new CreateSellerDto
         {
@@ -591,7 +591,7 @@ public class SellerUnitTest
             Telephone = sellerTelephone
         };
 
-        var createdSeller = (await sellerControllerToCreate.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -603,7 +603,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         // Act
         var actionResult = await sellerController.GetSellerById(createdSeller?.Id ?? Guid.Empty);
@@ -632,7 +632,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -644,7 +644,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -656,7 +656,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -689,7 +689,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -701,7 +701,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -713,7 +713,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -742,7 +742,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -754,7 +754,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -766,7 +766,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -792,7 +792,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -804,7 +804,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -816,7 +816,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -848,7 +848,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -860,7 +860,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -872,7 +872,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -898,7 +898,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -910,7 +910,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -922,7 +922,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -958,7 +958,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -970,7 +970,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -982,7 +982,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -1013,7 +1013,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -1025,7 +1025,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -1037,7 +1037,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -1065,7 +1065,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -1077,7 +1077,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -1089,7 +1089,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -1117,7 +1117,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -1129,7 +1129,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -1141,7 +1141,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -1169,7 +1169,7 @@ public class SellerUnitTest
 
         var sellerRepository = new SellerRepository(dbContext);
         var sellerService = new SellerService(sellerRepository);
-        var sellerControllerToCreateSeller = new SellerController(sellerService);
+        var sellerController = new SellerController(sellerService);
 
         var loginService = new LoginService(sellerRepository);
         var tokenController = new TokenController(loginService);
@@ -1181,7 +1181,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
-        var createdSeller = (await sellerControllerToCreateSeller.CreateSeller(createSellerDto) as CreatedResult)
+        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
             ?.Value as SellerDto?;
 
         var loginDto = new LoginDto
@@ -1193,7 +1193,7 @@ public class SellerUnitTest
         var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
 
-        var sellerController = new SellerController(sellerService, claims);
+        sellerController = new SellerController(sellerService, claims);
 
         var updateSellerDto = new UpdateSellerDto
         {
