@@ -4,5 +4,4 @@ WORKDIR /Build
 COPY *.sln ./
 COPY ./Src ./Src
 
-RUN dotnet restore
-RUN dotnet test
+ENTRYPOINT ["dotnet", "test"]

@@ -28,6 +28,6 @@ services:
       JWT_KEY: "9a5835502c69a59d42d5438316d3d43cd2fb0bdd789b3de98f1d0d58e25dbaa5"
     ports:
       - "5182:80"
-    restart: unless-stopped
+    restart: "no"
     volumes:
       - api:/Api
