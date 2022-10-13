@@ -4,13 +4,10 @@ namespace ECommerce.Api.Utils;
 
 public static class JwtUtil
 {
-    public static Dictionary<string, string> ClaimsToDictionary(IEnumerable<Claim> claims)
-        => claims.ToDictionary(c => c.Type, c => c.Value);
-
-    public static Guid GetSellerGuid(Dictionary<string, string> claimsDictionary)
+    public static Guid GetSellerGuid(IEnumerable<Claim> claims)
     {
-        claimsDictionary.TryGetValue("sellerId", out var sellerId);
-        Guid.TryParse(sellerId, out var sellerGuid);
+        var claim = claims.FirstOrDefault(c => c.Type == "sellerId")?.Value;
+        Guid.TryParse(claim, out var sellerGuid);
 
         return sellerGuid;
     }

@@ -23,14 +23,9 @@ public class SellerController : ControllerBase
     {
         _sellerService = sellerService;
 
-        // DOT NOT REMOVE USER NULLABLE CHECK
-        var tempClaims = claims ?? User?.Claims ?? Array.Empty<Claim>();
-
-        var claimsDictionary = tempClaims != Array.Empty<Claim>()
-            ? JwtUtil.ClaimsToDictionary(tempClaims)
-            : new Dictionary<string, string>();
-
-        _sellerGuid = JwtUtil.GetSellerGuid(claimsDictionary);
+        // The user can be null if not used by a HTTP request
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+        _sellerGuid = JwtUtil.GetSellerGuid(claims ?? User?.Claims ?? Array.Empty<Claim>());
     }
 
     /// <summary>
