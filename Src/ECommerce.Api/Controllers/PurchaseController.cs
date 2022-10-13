@@ -37,7 +37,6 @@ public class PurchaseController : ControllerBase
     /// <summary>
     /// Creates a purchase.
     /// </summary>
-    /// <response code="409">Conflict</response>
     /// <response code="201">Created</response>
     [HttpPost]
     public async Task<IActionResult> CreatePurchase()
@@ -53,7 +52,6 @@ public class PurchaseController : ControllerBase
 
         return statusCode switch
         {
-            HttpStatusCode.Conflict => Conflict(),
             HttpStatusCode.Created => Created(string.Empty, createdPurchase),
             _ => Problem()
         };
