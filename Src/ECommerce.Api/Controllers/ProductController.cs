@@ -42,7 +42,7 @@ public class ProductController : ControllerBase
         return statusCode switch
         {
             HttpStatusCode.Conflict => Conflict(),
-            HttpStatusCode.Created => Ok(createdProduct),
+            HttpStatusCode.Created => Created(string.Empty, createdProduct),
             _ => Problem()
         };
     }
