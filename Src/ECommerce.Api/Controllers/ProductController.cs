@@ -26,8 +26,8 @@ public class ProductController : ControllerBase
     /// </summary>
     /// <param name="productDto"></param>
     /// <response code="409">Conflict</response>
-    /// <response code="201">Created</response>
     [HttpPost]
+    [ProducesResponseType(typeof(ProductDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto productDto)
     {
         if (string.IsNullOrWhiteSpace(productDto.Name))
@@ -72,6 +72,7 @@ public class ProductController : ControllerBase
     /// <param name="productId"></param>
     /// <response code="404">Not Found</response>
     [HttpGet("{productId:Guid}")]
+    [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProductById([FromRoute] Guid productId)
     {
         var (productDto, statusCode) = await _productService.GetProductById(productId);
