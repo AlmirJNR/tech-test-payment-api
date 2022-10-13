@@ -17,14 +17,20 @@ namespace ECommerce.Api.Controllers;
 public class SellerController : ControllerBase
 {
     private readonly ISellerService _sellerService;
-    private readonly IEnumerable<Claim> _claims;
+    private readonly Guid _sellerGuid;
 
     public SellerController(ISellerService sellerService, IEnumerable<Claim>? claims = null)
     {
         _sellerService = sellerService;
-        
+
         // DOT NOT REMOVE USER NULLABLE CHECK
-        _claims = claims ?? User?.Claims ?? Array.Empty<Claim>();
+        var tempClaims = claims ?? User?.Claims ?? Array.Empty<Claim>();
+
+        var claimsDictionary = tempClaims != Array.Empty<Claim>()
+            ? JwtUtil.ClaimsToDictionary(tempClaims)
+            : new Dictionary<string, string>();
+
+        _sellerGuid = JwtUtil.GetSellerGuid(claimsDictionary);
     }
 
     /// <summary>
@@ -65,12 +71,10 @@ public class SellerController : ControllerBase
     [HttpDelete("{sellerId:Guid}")]
     public async Task<IActionResult> DeleteSeller([FromRoute] Guid sellerId)
     {
-        var claimsDictionary = JwtUtil.ClaimsToDictionary(_claims);
-        var requestingSellerId = JwtUtil.GetSellerGuid(claimsDictionary);
-        if (requestingSellerId is null)
+        if (_sellerGuid == Guid.Empty)
             return BadRequest();
 
-        if (requestingSellerId != sellerId)
+        if (_sellerGuid != sellerId)
             return Unauthorized();
 
         var statusCode = await _sellerService.DeleteSeller(sellerId);
@@ -92,12 +96,10 @@ public class SellerController : ControllerBase
     [ProducesResponseType(typeof(SellerDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSellerById([FromRoute] Guid sellerId)
     {
-        var claimsDictionary = JwtUtil.ClaimsToDictionary(_claims);
-        var requestingSellerId = JwtUtil.GetSellerGuid(claimsDictionary);
-        if (requestingSellerId is null)
+        if (_sellerGuid == Guid.Empty)
             return BadRequest();
 
-        if (requestingSellerId != sellerId)
+        if (_sellerGuid != sellerId)
             return Unauthorized();
 
         var (sellerDto, statusCode) = await _sellerService.GetSellerById(sellerId);
@@ -120,12 +122,10 @@ public class SellerController : ControllerBase
     [HttpPut("{sellerId:Guid}")]
     public async Task<IActionResult> UpdateSeller([FromRoute] Guid sellerId, [FromBody] UpdateSellerDto sellerDto)
     {
-        var claimsDictionary = JwtUtil.ClaimsToDictionary(_claims);
-        var requestingSellerId = JwtUtil.GetSellerGuid(claimsDictionary);
-        if (requestingSellerId is null)
+        if (_sellerGuid == Guid.Empty)
             return BadRequest();
 
-        if (requestingSellerId != sellerId)
+        if (_sellerGuid != sellerId)
             return Unauthorized();
 
         if (string.IsNullOrWhiteSpace(sellerDto.Cpf)
