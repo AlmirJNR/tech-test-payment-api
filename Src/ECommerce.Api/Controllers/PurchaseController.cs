@@ -1,4 +1,6 @@
 using System.Net;
+using System.Security.Claims;
+using ECommerce.Api.Utils;
 using ECommerce.Contracts.Dtos.Purchase;
 using ECommerce.Contracts.Enums;
 using ECommerce.Contracts.Interfaces.Services;
@@ -17,33 +19,37 @@ public class PurchaseController : ControllerBase
 {
     private readonly IPurchaseService _purchaseService;
     private readonly ISellerService _sellerService;
+    private readonly Guid _sellerGuid;
 
-    public PurchaseController(IPurchaseService purchaseService, ISellerService sellerService)
+    public PurchaseController(
+        IPurchaseService purchaseService,
+        ISellerService sellerService,
+        IEnumerable<Claim>? claims = null)
     {
         _purchaseService = purchaseService;
         _sellerService = sellerService;
+
+        // The user can be null if not used by a HTTP request
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+        _sellerGuid = JwtUtil.GetSellerGuid(claims ?? User?.Claims ?? Array.Empty<Claim>());
     }
 
     /// <summary>
     /// Creates a purchase.
     /// </summary>
-    /// <param name="purchaseDto"></param>
     /// <response code="409">Conflict</response>
     /// <response code="201">Created</response>
     [HttpPost]
-    public async Task<IActionResult> CreatePurchase([FromBody] CreatePurchaseDto purchaseDto)
+    public async Task<IActionResult> CreatePurchase()
     {
-        if (purchaseDto.SellerId == Guid.Empty)
+        if (_sellerGuid == Guid.Empty)
             return BadRequest("Invalid seller id");
 
-        var (sellerExists, _) = await _sellerService.GetSellerById(purchaseDto.SellerId);
+        var (sellerExists, _) = await _sellerService.GetSellerById(_sellerGuid);
         if (sellerExists is null)
             return BadRequest("Seller doesn't exists");
 
-        if (purchaseDto.PurchaseStatusId is null or not PurchaseStatusEnum.WaitingPayment)
-            purchaseDto.PurchaseStatusId = PurchaseStatusEnum.WaitingPayment;
-
-        var (createdPurchase, statusCode) = await _purchaseService.CreatePurchase(purchaseDto);
+        var (createdPurchase, statusCode) = await _purchaseService.CreatePurchase(_sellerGuid);
 
         return statusCode switch
         {
@@ -62,6 +68,13 @@ public class PurchaseController : ControllerBase
     [HttpDelete("{purchaseId:Guid}")]
     public async Task<IActionResult> DeletePurchase([FromRoute] Guid purchaseId)
     {
+        if (_sellerGuid == Guid.Empty)
+            return BadRequest("Invalid seller id");
+
+        var (purchaseDto, _) = await _purchaseService.GetPurchaseById(purchaseId);
+        if (purchaseDto?.SellerId != _sellerGuid)
+            return Unauthorized();
+
         var statusCode = await _purchaseService.DeletePurchase(purchaseId);
 
         return statusCode switch
@@ -81,7 +94,12 @@ public class PurchaseController : ControllerBase
     [ProducesResponseType(typeof(PurchaseDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPurchaseById([FromRoute] Guid purchaseId)
     {
+        if (_sellerGuid == Guid.Empty)
+            return BadRequest("Invalid seller id");
+
         var (purchaseDto, statusCode) = await _purchaseService.GetPurchaseById(purchaseId);
+        if (purchaseDto?.SellerId != _sellerGuid)
+            return Unauthorized();
 
         return statusCode switch
         {
@@ -103,6 +121,12 @@ public class PurchaseController : ControllerBase
         [FromRoute] Guid purchaseId,
         [FromBody] UpdatePurchaseDto purchaseDto)
     {
+        if (_sellerGuid == Guid.Empty)
+            return BadRequest("Invalid seller id");
+
+        if (purchaseDto.SellerId != _sellerGuid)
+            return Unauthorized();
+
         if (purchaseDto.SellerId is null
             || (purchaseDto.SellerId == Guid.Empty
                 && purchaseDto.PurchaseStatusId is null or < PurchaseStatusEnum.WaitingPayment))
@@ -129,7 +153,7 @@ public class PurchaseController : ControllerBase
         {
             case PurchaseStatusEnum.WaitingPayment
                 when purchaseDto.PurchaseStatusId is not
-                    PurchaseStatusEnum.PaymentApproved or PurchaseStatusEnum.Cancelled:
+                    PurchaseStatusEnum.PaymentApproved or PurchaseStatusEnum.Cancelled or PurchaseStatusEnum.Rejected:
                 return BadRequest(invalidPurchaseOrder);
 
             case PurchaseStatusEnum.PaymentApproved
