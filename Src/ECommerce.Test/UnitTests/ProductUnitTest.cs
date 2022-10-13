@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using ECommerce.Api.Controllers;
 using ECommerce.Api.Repositories;
 using ECommerce.Api.Services;
@@ -27,7 +28,7 @@ public class ProductUnitTest
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
             .UseInMemoryDatabase(
-                $"{nameof(Create_Product_Should_Return_BadRequest)}{productName}{productAmount}{productPrice}")
+                $"{MethodBase.GetCurrentMethod()!.Name}{productName}{productAmount}{productPrice}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -61,7 +62,7 @@ public class ProductUnitTest
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
             .UseInMemoryDatabase(
-                $"{nameof(Create_Product_Should_Return_Conflict)}{productName}{productAmount}{productPrice}")
+                $"{MethodBase.GetCurrentMethod()!.Name}{productName}{productAmount}{productPrice}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -96,7 +97,7 @@ public class ProductUnitTest
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
             .UseInMemoryDatabase(
-                $"{nameof(Create_Product_Should_Return_Created)}{productName}{productAmount}{productPrice}")
+                $"{MethodBase.GetCurrentMethod()!.Name}{productName}{productAmount}{productPrice}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -127,7 +128,7 @@ public class ProductUnitTest
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
             .UseInMemoryDatabase(
-                $"{nameof(Delete_Product_Should_Return_NotFound)}{productId}")
+                $"{MethodBase.GetCurrentMethod()!.Name}{productId}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -156,7 +157,7 @@ public class ProductUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Delete_Product_Should_Return_Ok))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -186,7 +187,7 @@ public class ProductUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Get_Product_By_Id_Should_Return_NotFound))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -215,7 +216,7 @@ public class ProductUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Get_Product_By_Id_Should_Return_Ok))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -245,7 +246,7 @@ public class ProductUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Update_Product_By_Id_Should_Return_BadRequest))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -282,7 +283,7 @@ public class ProductUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Update_Product_By_Id_Should_Return_NotFound))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -318,7 +319,7 @@ public class ProductUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Update_Product_By_Id_Should_Return_Ok))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 

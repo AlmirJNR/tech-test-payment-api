@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using ECommerce.Api.Controllers;
@@ -45,7 +46,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Create_Seller_Should_Return_BadRequest))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -73,7 +74,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Create_Seller_Should_Return_Conflict))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -124,7 +125,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Create_Seller_Should_Return_Created))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -160,7 +161,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Delete_Seller_Should_Return_Unauthorized))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -215,7 +216,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Delete_Seller_Should_Return_BadRequest))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -283,7 +284,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Delete_Seller_Should_Return_NotFound))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -339,7 +340,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Delete_Seller_Should_Return_Ok))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -393,7 +394,7 @@ public class SellerUnitTest
         string sellerTelephone)
     {
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Get_Seller_By_Id_Should_Return_Unauthorized))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -448,7 +449,7 @@ public class SellerUnitTest
         string sellerTelephone)
     {
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Get_Seller_By_Id_Should_Return_BadRequest))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -516,7 +517,7 @@ public class SellerUnitTest
         string sellerTelephone)
     {
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Get_Seller_By_Id_Should_Return_NotFound))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -571,7 +572,7 @@ public class SellerUnitTest
         string sellerTelephone)
     {
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Get_Seller_By_Id_Should_Return_Ok))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -626,7 +627,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Update_Seller_By_Id_Should_Return_Unauthorized))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -683,7 +684,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{nameof(Update_Seller_Cpf_By_Id_Should_Return_BadRequest)}{newSellerCpf}")
+            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerCpf}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -736,7 +737,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{nameof(Update_Seller_Email_By_Id_Should_Return_BadRequest)}{newSellerEmail}")
+            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerEmail}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -786,7 +787,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{nameof(Update_Seller_Name_By_Id_Should_Return_BadRequest)}{newSellerName}")
+            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerName}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -842,7 +843,7 @@ public class SellerUnitTest
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
             .UseInMemoryDatabase(
-                $"{nameof(Update_Seller_Telephone_By_Id_Should_Return_BadRequest)}{newSellerTelephone}")
+                $"{MethodBase.GetCurrentMethod()!.Name}{newSellerTelephone}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -892,7 +893,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{nameof(Update_Seller_Any_Value_By_Id_Should_Return_NotFound)}{newSellerTelephone}")
+            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerTelephone}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -952,7 +953,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Update_Seller_Values_With_Same_Existing_Values_By_Id_Should_Return_Ok))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -1007,7 +1008,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{nameof(Update_Seller_Cpf_By_Id_Should_Return_Ok)}{newSellerCpf}")
+            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerCpf}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -1059,7 +1060,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{nameof(Update_Seller_Email_By_Id_Should_Return_Ok)}{newSellerEmail}")
+            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerEmail}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -1111,7 +1112,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{nameof(Update_Seller_Name_By_Id_Should_Return_Ok)}{newSellerName}")
+            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerName}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -1163,7 +1164,7 @@ public class SellerUnitTest
     {
         // Arrange
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{nameof(Update_Seller_Telephone_By_Id_Should_Return_Ok)}{newSellerTelephone}")
+            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerTelephone}")
             .Options;
         await using var dbContext = new EcommerceContext(options);
 

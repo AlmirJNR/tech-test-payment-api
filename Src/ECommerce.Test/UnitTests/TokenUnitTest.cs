@@ -1,3 +1,4 @@
+using System.Reflection;
 using ECommerce.Api.Controllers;
 using ECommerce.Api.Repositories;
 using ECommerce.Api.Services;
@@ -39,7 +40,7 @@ public class TokenUnitTest
     {
         // Arrange - Shared
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Generate_Token_Should_Return_BadRequest))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
@@ -90,7 +91,7 @@ public class TokenUnitTest
     {
         // Arrange - Shared
         var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(nameof(Generate_Token_Should_Return_Created))
+            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
             .Options;
         await using var dbContext = new EcommerceContext(options);
 
