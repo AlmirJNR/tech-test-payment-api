@@ -9,17 +9,17 @@ namespace ECommerce.Api.Repositories;
 public class PurchaseProductRepository : IPurchaseProductRepository
 {
     private readonly EcommerceContext _dbContext;
-    private readonly DbSet<PurchaseProduct> _purchaseProductsEntity;
+    private readonly DbSet<PurchaseProduct> _purchaseProductTable;
 
     public PurchaseProductRepository(EcommerceContext dbContext)
     {
         _dbContext = dbContext;
-        _purchaseProductsEntity = _dbContext.PurchaseProducts;
+        _purchaseProductTable = _dbContext.PurchaseProducts;
     }
 
     public async Task<(PurchaseProduct?, HttpStatusCode)> CreatePurchaseProduct(PurchaseProduct purchaseProductModel)
     {
-        var exists = await _purchaseProductsEntity
+        var exists = await _purchaseProductTable
             .FirstOrDefaultAsync(pp =>
                 pp.PurchaseId == purchaseProductModel.PurchaseId
                 && pp.ProductId == purchaseProductModel.ProductId
@@ -27,7 +27,7 @@ public class PurchaseProductRepository : IPurchaseProductRepository
         if (exists is not null)
             return (null, HttpStatusCode.Conflict);
 
-        var addedEntity = _purchaseProductsEntity.Add(purchaseProductModel);
+        var addedEntity = _purchaseProductTable.Add(purchaseProductModel);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges != 1
@@ -37,7 +37,7 @@ public class PurchaseProductRepository : IPurchaseProductRepository
 
     public async Task<HttpStatusCode> DeletePurchaseProduct(Guid purchaseId, Guid productId)
     {
-        var purchaseProductEntity = await _purchaseProductsEntity
+        var purchaseProductEntity = await _purchaseProductTable
             .FirstOrDefaultAsync(pp =>
                 pp.PurchaseId == purchaseId
                 && pp.ProductId == productId
@@ -47,7 +47,7 @@ public class PurchaseProductRepository : IPurchaseProductRepository
 
         purchaseProductEntity.DeletedAt = DateTime.Now;
 
-        _purchaseProductsEntity.Update(purchaseProductEntity);
+        _purchaseProductTable.Update(purchaseProductEntity);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges != 1
@@ -57,7 +57,7 @@ public class PurchaseProductRepository : IPurchaseProductRepository
 
     public async Task<(PurchaseProduct?, HttpStatusCode)> GetPurchaseProductById(Guid purchaseId, Guid productId)
     {
-        var purchaseProductEntity = await _purchaseProductsEntity
+        var purchaseProductEntity = await _purchaseProductTable
             .FirstOrDefaultAsync(pp =>
                 pp.PurchaseId == purchaseId
                 && pp.ProductId == productId
@@ -70,7 +70,7 @@ public class PurchaseProductRepository : IPurchaseProductRepository
 
     public async Task<HttpStatusCode> UpdatePurchaseProduct(PurchaseProduct purchaseProductModel)
     {
-        var purchaseProductEntity = await _purchaseProductsEntity
+        var purchaseProductEntity = await _purchaseProductTable
             .FirstOrDefaultAsync(pp =>
                 pp.PurchaseId == purchaseProductModel.PurchaseId
                 && pp.ProductId == purchaseProductModel.ProductId
@@ -87,7 +87,7 @@ public class PurchaseProductRepository : IPurchaseProductRepository
         if (purchaseProductEntity.ProductAmount != 0)
             purchaseProductEntity.ProductAmount = purchaseProductModel.ProductAmount;
 
-        _purchaseProductsEntity.Update(purchaseProductEntity);
+        _purchaseProductTable.Update(purchaseProductEntity);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges switch

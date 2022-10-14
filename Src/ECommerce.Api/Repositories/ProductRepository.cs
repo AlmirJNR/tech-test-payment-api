@@ -9,22 +9,22 @@ namespace ECommerce.Api.Repositories;
 public class ProductRepository : IProductRepository
 {
     private readonly EcommerceContext _dbContext;
-    private readonly DbSet<Product> _productsEntity;
+    private readonly DbSet<Product> _productTable;
 
     public ProductRepository(EcommerceContext dbContext)
     {
         _dbContext = dbContext;
-        _productsEntity = _dbContext.Products;
+        _productTable = _dbContext.Products;
     }
 
     public async Task<(Product?, HttpStatusCode)> CreateProduct(Product productModel)
     {
-        var exists = await _productsEntity
+        var exists = await _productTable
             .FirstOrDefaultAsync(p => p.Name == productModel.Name);
         if (exists is not null)
             return (null, HttpStatusCode.Conflict);
 
-        var addedEntity = await _productsEntity.AddAsync(productModel);
+        var addedEntity = await _productTable.AddAsync(productModel);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges != 1
@@ -34,7 +34,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<HttpStatusCode> DeleteProduct(Guid productId)
     {
-        var productEntity = await _productsEntity
+        var productEntity = await _productTable
             .FirstOrDefaultAsync(p =>
                 p.Id == productId
                 && p.DeletedAt == null);
@@ -43,7 +43,7 @@ public class ProductRepository : IProductRepository
 
         productEntity.DeletedAt = DateTime.Now;
 
-        _productsEntity.Update(productEntity);
+        _productTable.Update(productEntity);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges != 1
@@ -53,7 +53,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<(Product?, HttpStatusCode)> GetProductById(Guid productId)
     {
-        var productEntity = await _productsEntity
+        var productEntity = await _productTable
             .FirstOrDefaultAsync(p =>
                 p.Id == productId
                 && p.DeletedAt == null);
@@ -65,7 +65,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<HttpStatusCode> UpdateProduct(Product productModel)
     {
-        var productEntity = await _productsEntity
+        var productEntity = await _productTable
             .FirstOrDefaultAsync(p =>
                 p.Id == productModel.Id
                 && p.DeletedAt == null);
@@ -81,7 +81,7 @@ public class ProductRepository : IProductRepository
         if (productModel.Price > 0)
             productEntity.Price = productModel.Price;
 
-        _productsEntity.Update(productEntity);
+        _productTable.Update(productEntity);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges switch

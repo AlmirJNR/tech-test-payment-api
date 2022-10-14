@@ -9,17 +9,17 @@ namespace ECommerce.Api.Repositories;
 public class SellerRepository : ISellerRepository
 {
     private readonly EcommerceContext _dbContext;
-    private readonly DbSet<Seller> _sellersEntity;
+    private readonly DbSet<Seller> _sellerTable;
 
     public SellerRepository(EcommerceContext dbContext)
     {
         _dbContext = dbContext;
-        _sellersEntity = _dbContext.Sellers;
+        _sellerTable = _dbContext.Sellers;
     }
 
     public async Task<(Seller?, HttpStatusCode)> CreateSeller(Seller sellerModel)
     {
-        var exists = await _sellersEntity
+        var exists = await _sellerTable
             .FirstOrDefaultAsync(s =>
                 s.Cpf == sellerModel.Cpf
                 || s.Email == sellerModel.Email
@@ -27,7 +27,7 @@ public class SellerRepository : ISellerRepository
         if (exists is not null)
             return (null, HttpStatusCode.Conflict);
 
-        var addedEntity = await _sellersEntity.AddAsync(sellerModel);
+        var addedEntity = await _sellerTable.AddAsync(sellerModel);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges != 1
@@ -37,7 +37,7 @@ public class SellerRepository : ISellerRepository
 
     public async Task<HttpStatusCode> DeleteSeller(Guid sellerId)
     {
-        var sellerEntity = await _sellersEntity
+        var sellerEntity = await _sellerTable
             .FirstOrDefaultAsync(s =>
                 s.Id == sellerId
                 && s.DeletedAt == null);
@@ -46,7 +46,7 @@ public class SellerRepository : ISellerRepository
 
         sellerEntity.DeletedAt = DateTime.Now;
 
-        _sellersEntity.Update(sellerEntity);
+        _sellerTable.Update(sellerEntity);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges != 1
@@ -56,7 +56,7 @@ public class SellerRepository : ISellerRepository
 
     public async Task<(Seller?, HttpStatusCode)> GetSellerById(Guid sellerId)
     {
-        var sellerEntity = await _sellersEntity
+        var sellerEntity = await _sellerTable
             .FirstOrDefaultAsync(s =>
                 s.Id == sellerId
                 && s.DeletedAt == null);
@@ -68,7 +68,7 @@ public class SellerRepository : ISellerRepository
 
     public async Task<(Seller?, HttpStatusCode)> SellerLogin(string cpf, string email)
     {
-        var sellerEntity = await _sellersEntity
+        var sellerEntity = await _sellerTable
             .FirstOrDefaultAsync(s =>
                 s.Cpf == cpf
                 && s.Email == email
@@ -81,7 +81,7 @@ public class SellerRepository : ISellerRepository
 
     public async Task<HttpStatusCode> UpdateSeller(Seller sellerModel)
     {
-        var sellerEntity = await _sellersEntity
+        var sellerEntity = await _sellerTable
             .FirstOrDefaultAsync(s =>
                 s.Id == sellerModel.Id
                 && s.DeletedAt == null);
@@ -100,7 +100,7 @@ public class SellerRepository : ISellerRepository
         if (!string.IsNullOrWhiteSpace(sellerModel.Telephone))
             sellerEntity.Telephone = sellerModel.Telephone;
 
-        _sellersEntity.Update(sellerEntity);
+        _sellerTable.Update(sellerEntity);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges switch
