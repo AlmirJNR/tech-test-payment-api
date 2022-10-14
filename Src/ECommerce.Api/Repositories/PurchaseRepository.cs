@@ -9,17 +9,17 @@ namespace ECommerce.Api.Repositories;
 public class PurchaseRepository : IPurchaseRepository
 {
     private readonly EcommerceContext _dbContext;
-    private readonly DbSet<Purchase> _purchasesEntity;
+    private readonly DbSet<Purchase> _purchaseTable;
 
     public PurchaseRepository(EcommerceContext dbContext)
     {
         _dbContext = dbContext;
-        _purchasesEntity = _dbContext.Purchases;
+        _purchaseTable = _dbContext.Purchases;
     }
 
     public async Task<(Purchase?, HttpStatusCode)> CreatePurchase(Purchase purchaseModel)
     {
-        var addedEntity = await _purchasesEntity.AddAsync(purchaseModel);
+        var addedEntity = await _purchaseTable.AddAsync(purchaseModel);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges != 1
@@ -29,7 +29,7 @@ public class PurchaseRepository : IPurchaseRepository
 
     public async Task<HttpStatusCode> DeletePurchase(Guid purchaseId)
     {
-        var purchaseEntity = await _purchasesEntity
+        var purchaseEntity = await _purchaseTable
             .FirstOrDefaultAsync(p =>
                 p.Id == purchaseId
                 && p.DeletedAt == null);
@@ -38,7 +38,7 @@ public class PurchaseRepository : IPurchaseRepository
 
         purchaseEntity.DeletedAt = DateTime.Now;
 
-        _purchasesEntity.Update(purchaseEntity);
+        _purchaseTable.Update(purchaseEntity);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges != 1
@@ -48,7 +48,7 @@ public class PurchaseRepository : IPurchaseRepository
 
     public async Task<(Purchase?, HttpStatusCode)> GetPurchaseById(Guid purchaseId)
     {
-        var purchaseEntity = await _purchasesEntity
+        var purchaseEntity = await _purchaseTable
             .FirstOrDefaultAsync(p =>
                 p.Id == purchaseId
                 && p.DeletedAt == null);
@@ -60,20 +60,21 @@ public class PurchaseRepository : IPurchaseRepository
 
     public async Task<HttpStatusCode> UpdatePurchase(Purchase purchaseModel)
     {
-        var purchaseEntity = await _purchasesEntity
+        var purchaseEntity = await _purchaseTable
             .FirstOrDefaultAsync(p =>
                 p.Id == purchaseModel.Id
                 && p.DeletedAt == null);
         if (purchaseEntity is null)
             return HttpStatusCode.NotFound;
 
-        if (purchaseModel.SellerId != Guid.Empty)
+        if (purchaseModel.SellerId != Guid.Empty
+            && purchaseModel.SellerId != purchaseEntity.SellerId)
             purchaseEntity.SellerId = purchaseModel.SellerId;
 
         if (purchaseModel.PurchaseStatusId is not null)
             purchaseEntity.PurchaseStatusId = purchaseModel.PurchaseStatusId;
 
-        _purchasesEntity.Update(purchaseModel);
+        _purchaseTable.Update(purchaseEntity);
         var savedChanges = await _dbContext.SaveChangesAsync();
 
         return savedChanges switch
