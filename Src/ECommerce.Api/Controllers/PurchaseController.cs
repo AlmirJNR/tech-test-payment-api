@@ -70,7 +70,10 @@ public class PurchaseController : ControllerBase
             return BadRequest("Invalid seller id");
 
         var (purchaseDto, _) = await _purchaseService.GetPurchaseById(purchaseId);
-        if (purchaseDto?.SellerId != _sellerGuid)
+        if (purchaseDto is null)
+            return NotFound();
+
+        if (purchaseDto.Value.SellerId != _sellerGuid)
             return Unauthorized();
 
         var statusCode = await _purchaseService.DeletePurchase(purchaseId);
@@ -96,6 +99,9 @@ public class PurchaseController : ControllerBase
             return BadRequest("Invalid seller id");
 
         var (purchaseDto, statusCode) = await _purchaseService.GetPurchaseById(purchaseId);
+        if (purchaseDto is null)
+            return NotFound();
+
         if (purchaseDto?.SellerId != _sellerGuid)
             return Unauthorized();
 
@@ -111,26 +117,21 @@ public class PurchaseController : ControllerBase
     /// Update almost any field from the purchase with the informed Id.
     /// </summary>
     /// <param name="purchaseId"></param>
-    /// <param name="purchaseDto"></param>
+    /// <param name="purchaseStatus"></param>
     /// <response code="404">Not Found</response>
     /// <response code="200">Ok</response>
-    [HttpPut("{purchaseId:Guid}")]
+    [HttpPatch("{purchaseId:Guid}/purchaseStatus/{purchaseStatus}")]
     public async Task<IActionResult> UpdatePurchase(
         [FromRoute] Guid purchaseId,
-        [FromBody] UpdatePurchaseDto purchaseDto)
+        [FromRoute] PurchaseStatusEnum? purchaseStatus)
     {
         if (_sellerGuid == Guid.Empty)
             return BadRequest("Invalid seller id");
 
-        if (purchaseDto.SellerId != _sellerGuid)
-            return Unauthorized();
-
-        if (purchaseDto.SellerId is null
-            || (purchaseDto.SellerId == Guid.Empty
-                && purchaseDto.PurchaseStatusId is null or < PurchaseStatusEnum.WaitingPayment))
+        if (purchaseStatus is null or < PurchaseStatusEnum.WaitingPayment)
             return BadRequest("Nothing to update");
 
-        if (purchaseDto.PurchaseStatusId is not null and not (PurchaseStatusEnum.WaitingPayment
+        if (purchaseStatus is not null and not (PurchaseStatusEnum.WaitingPayment
             or PurchaseStatusEnum.PaymentApproved
             or PurchaseStatusEnum.Shipping
             or PurchaseStatusEnum.Delivered
@@ -142,7 +143,7 @@ public class PurchaseController : ControllerBase
         if (purchaseModel is null)
             return NotFound();
 
-        var (sellerModel, _) = await _sellerService.GetSellerById(purchaseDto.SellerId.Value);
+        var (sellerModel, _) = await _sellerService.GetSellerById(_sellerGuid);
         if (sellerModel is null)
             return NotFound();
 
@@ -150,21 +151,21 @@ public class PurchaseController : ControllerBase
         switch (purchaseModel.Value.PurchaseStatusId)
         {
             case PurchaseStatusEnum.WaitingPayment
-                when purchaseDto.PurchaseStatusId is not
-                    PurchaseStatusEnum.PaymentApproved or PurchaseStatusEnum.Cancelled or PurchaseStatusEnum.Rejected:
+                when purchaseStatus is not
+                    (PurchaseStatusEnum.PaymentApproved or PurchaseStatusEnum.Cancelled or PurchaseStatusEnum.Rejected):
                 return BadRequest(invalidPurchaseOrder);
 
             case PurchaseStatusEnum.PaymentApproved
-                when purchaseDto.PurchaseStatusId is not
-                    PurchaseStatusEnum.Shipping or PurchaseStatusEnum.Cancelled:
+                when purchaseStatus is not
+                    (PurchaseStatusEnum.Shipping or PurchaseStatusEnum.Cancelled):
                 return BadRequest(invalidPurchaseOrder);
 
             case PurchaseStatusEnum.Shipping
-                when purchaseDto.PurchaseStatusId is not PurchaseStatusEnum.Delivered:
+                when purchaseStatus is not PurchaseStatusEnum.Delivered:
                 return BadRequest(invalidPurchaseOrder);
         }
 
-        var statusCode = await _purchaseService.UpdatePurchase(purchaseId, purchaseDto);
+        var statusCode = await _purchaseService.UpdatePurchase(purchaseId, purchaseStatus);
 
         return statusCode switch
         {

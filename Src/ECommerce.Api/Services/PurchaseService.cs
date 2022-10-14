@@ -35,11 +35,10 @@ public class PurchaseService : IPurchaseService
         return (PurchaseDto.FromModel(purchaseModel), statusCode);
     }
 
-    public Task<HttpStatusCode> UpdatePurchase(Guid purchaseId, UpdatePurchaseDto purchaseDto)
-    {
-        var purchaseModel = purchaseDto.ToModel();
-        purchaseModel.Id = purchaseId;
-
-        return _purchaseRepository.UpdatePurchase(purchaseModel);
-    }
+    public Task<HttpStatusCode> UpdatePurchase(Guid purchaseId, PurchaseStatusEnum? purchaseStatus)
+        => _purchaseRepository.UpdatePurchase(new Purchase
+        {
+            Id = purchaseId,
+            PurchaseStatusId = (short?)purchaseStatus
+        });
 }
