@@ -1,13 +1,7 @@
 using System;
-using System.Reflection;
-using ECommerce.Api.Controllers;
-using ECommerce.Api.Repositories;
-using ECommerce.Api.Services;
 using ECommerce.Contracts.Dtos.Product;
-using ECommerce.Data.Context;
 using ECommerce.Test.Utils;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace ECommerce.Test.UnitTests;
@@ -26,15 +20,7 @@ public class ProductUnitTest
         decimal productPrice)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(
-                $"{MethodBase.GetCurrentMethod()!.Name}{productName}{productAmount}{productPrice}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var productRepository = new ProductRepository(dbContext);
-        var productService = new ProductService(productRepository);
-        var productController = new ProductController(productService);
+        var (_, _, productController) = ProductSetupUtils.SimpleSetupTestEnvironment();
 
         var createProductDto = new CreateProductDto
         {
@@ -60,15 +46,7 @@ public class ProductUnitTest
         decimal productPrice)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(
-                $"{MethodBase.GetCurrentMethod()!.Name}{productName}{productAmount}{productPrice}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var productRepository = new ProductRepository(dbContext);
-        var productService = new ProductService(productRepository);
-        var productController = new ProductController(productService);
+        var (_, _, productController) = ProductSetupUtils.SimpleSetupTestEnvironment();
 
         var createProductDto = new CreateProductDto
         {
@@ -95,15 +73,7 @@ public class ProductUnitTest
         decimal productPrice)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(
-                $"{MethodBase.GetCurrentMethod()!.Name}{productName}{productAmount}{productPrice}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var productRepository = new ProductRepository(dbContext);
-        var productService = new ProductService(productRepository);
-        var productController = new ProductController(productService);
+        var (_, _, productController) = ProductSetupUtils.SimpleSetupTestEnvironment();
 
         var createProductDto = new CreateProductDto
         {
@@ -119,34 +89,14 @@ public class ProductUnitTest
         Assert.True(actionResult is CreatedResult);
     }
 
-    [Theory]
-    [InlineData("b9fcf1d2-25ba-44c9-a20d-bfecaa874fdc")]
-    [InlineData("f35152e0-d9ab-4784-a944-ba69f55852c0")]
-    [InlineData("354f93e2-8bcc-4cbf-9499-b850c1447db4")]
-    public async void Delete_Product_Should_Return_NotFound(Guid productId)
+    [Fact]
+    public async void Delete_Product_Should_Return_NotFound()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(
-                $"{MethodBase.GetCurrentMethod()!.Name}{productId}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var productRepository = new ProductRepository(dbContext);
-        var productService = new ProductService(productRepository);
-        var productController = new ProductController(productService);
-
-        var createProductDto = new CreateProductDto
-        {
-            Name = "Product 1",
-            Amount = 5,
-            Price = 50.0M
-        };
-
-        await productController.CreateProduct(createProductDto);
+        var (_, _, productController) = ProductSetupUtils.SimpleSetupTestEnvironment();
 
         // Act
-        var actionResult = await productController.DeleteProduct(productId);
+        var actionResult = await productController.DeleteProduct(Guid.Empty);
 
         // Assert
         Assert.True(actionResult is NotFoundResult);
@@ -156,14 +106,7 @@ public class ProductUnitTest
     public async void Delete_Product_Should_Return_Ok()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var productRepository = new ProductRepository(dbContext);
-        var productService = new ProductService(productRepository);
-        var productController = new ProductController(productService);
+        var (_, _, productController) = ProductSetupUtils.SimpleSetupTestEnvironment();
 
         var createProductDto = new CreateProductDto
         {
@@ -171,7 +114,6 @@ public class ProductUnitTest
             Amount = 5,
             Price = 50.0M
         };
-
         var createdProductDto = (await productController.CreateProduct(createProductDto) as CreatedResult)
             ?.Value as ProductDto?;
 
@@ -186,26 +128,10 @@ public class ProductUnitTest
     public async void Get_Product_By_Id_Should_Return_NotFound()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var productRepository = new ProductRepository(dbContext);
-        var productService = new ProductService(productRepository);
-        var productController = new ProductController(productService);
-
-        var createProductDto = new CreateProductDto
-        {
-            Name = "Product 1",
-            Amount = 5,
-            Price = 50.0M
-        };
-
-        await productController.CreateProduct(createProductDto);
+        var (_, _, productController) = ProductSetupUtils.SimpleSetupTestEnvironment();
 
         // Act
-        var actionResult = await productController.GetProductById(Guid.NewGuid());
+        var actionResult = await productController.GetProductById(Guid.Empty);
 
         // Assert
         Assert.True(actionResult is NotFoundResult);
@@ -215,14 +141,7 @@ public class ProductUnitTest
     public async void Get_Product_By_Id_Should_Return_Ok()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var productRepository = new ProductRepository(dbContext);
-        var productService = new ProductService(productRepository);
-        var productController = new ProductController(productService);
+        var (_, _, productController) = ProductSetupUtils.SimpleSetupTestEnvironment();
 
         var createProductDto = new CreateProductDto
         {
@@ -230,7 +149,6 @@ public class ProductUnitTest
             Amount = 5,
             Price = 50.0M
         };
-
         var createdProductDto = (await productController.CreateProduct(createProductDto) as CreatedResult)
             ?.Value as ProductDto?;
 
@@ -245,14 +163,7 @@ public class ProductUnitTest
     public async void Update_Product_By_Id_Should_Return_BadRequest()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var productRepository = new ProductRepository(dbContext);
-        var productService = new ProductService(productRepository);
-        var productController = new ProductController(productService);
+        var (_, _, productController) = ProductSetupUtils.SimpleSetupTestEnvironment();
 
         var createProductDto = new CreateProductDto
         {
@@ -260,7 +171,6 @@ public class ProductUnitTest
             Amount = 5,
             Price = 50.0M
         };
-
         var createdProductDto = (await productController.CreateProduct(createProductDto) as CreatedResult)
             ?.Value as ProductDto?;
 
@@ -282,14 +192,7 @@ public class ProductUnitTest
     public async void Update_Product_By_Id_Should_Return_NotFound()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var productRepository = new ProductRepository(dbContext);
-        var productService = new ProductService(productRepository);
-        var productController = new ProductController(productService);
+        var (_, _, productController) = ProductSetupUtils.SimpleSetupTestEnvironment();
 
         var createProductDto = new CreateProductDto
         {
@@ -297,18 +200,17 @@ public class ProductUnitTest
             Amount = 5,
             Price = 50.0M
         };
-
         await productController.CreateProduct(createProductDto);
 
         var updateProductDto = new UpdateProductDto
         {
             Name = "product 2",
             Amount = 50,
-            Price = 250M
+            Price = 250.0M
         };
 
         // Act
-        var actionResult = await productController.UpdateProduct(new Guid(), updateProductDto);
+        var actionResult = await productController.UpdateProduct(Guid.NewGuid(), updateProductDto);
 
         // Assert
         Assert.True(actionResult is NotFoundResult);
@@ -318,14 +220,7 @@ public class ProductUnitTest
     public async void Update_Product_By_Id_Should_Return_Ok()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var productRepository = new ProductRepository(dbContext);
-        var productService = new ProductService(productRepository);
-        var productController = new ProductController(productService);
+        var (_, _, productController) = ProductSetupUtils.SimpleSetupTestEnvironment();
 
         var createProductDto = new CreateProductDto
         {
