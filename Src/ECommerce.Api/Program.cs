@@ -21,14 +21,16 @@ builder.Services
 builder.Services
     .AddTransient<ISellerRepository, SellerRepository>()
     .AddTransient<IProductRepository, ProductRepository>()
-    .AddTransient<IPurchaseRepository, PurchaseRepository>();
+    .AddTransient<IPurchaseRepository, PurchaseRepository>()
+    .AddTransient<IPurchaseProductRepository, PurchaseProductRepository>();
 
 // Services
 builder.Services
     .AddTransient<ILoginService, LoginService>()
     .AddTransient<ISellerService, SellerService>()
     .AddTransient<IProductService, ProductService>()
-    .AddTransient<IPurchaseService, PurchaseService>();
+    .AddTransient<IPurchaseService, PurchaseService>()
+    .AddTransient<IPurchaseProductService, PurchaseProductService>();
 
 // Controllers
 builder.Services.AddControllers();
