@@ -3,6 +3,7 @@ OBS: The test instructions are located [HERE](./TESTINSTRUCTIONS.md)
 
 ## PROJECT TECHNOLOGIES:
 - ASP.NET Core 6
+- XUnit
 - OpenApi/Swagger
 - PostgreSQL 14
 - Docker
