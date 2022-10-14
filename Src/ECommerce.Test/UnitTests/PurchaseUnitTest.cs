@@ -123,8 +123,8 @@ public class PurchaseUnitTest
     public async void Get_Purchase_By_Id_Should_Return_BadRequest()
     {
         // Arrange
-        var (sellerService, _, _, purchaseService, purchaseController, _) =
-            await PurchaseSetupUtils.SimpleSetupTestEnvironment();
+        var (sellerService, _, _,
+            purchaseService, purchaseController, _) = await PurchaseSetupUtils.SimpleSetupTestEnvironment();
         purchaseController = new PurchaseController(purchaseService, sellerService);
 
         // Act
