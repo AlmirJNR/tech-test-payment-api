@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using ECommerce.Api.Controllers;
@@ -15,6 +14,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Xunit;
+
+// ReSharper disable RedundantAssignment
 
 namespace ECommerce.Test.UnitTests;
 
@@ -45,14 +46,7 @@ public class SellerUnitTest
         string sellerTelephone)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
+        var (_, _, sellerController, _, _) = SellerSetupUtils.SimpleSetupTestEnvironment();
 
         // Act
         var createSellerDto = new CreateSellerDto
@@ -73,16 +67,8 @@ public class SellerUnitTest
     public async void Create_Seller_Should_Return_Conflict()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
+        var (_, _, sellerController, _, _) = SellerSetupUtils.SimpleSetupTestEnvironment();
 
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        // Act
         var createFirstSellerDto = new CreateSellerDto
         {
             Cpf = "123.456.789-01",
@@ -90,6 +76,7 @@ public class SellerUnitTest
             Name = "John Doe",
             Telephone = "+00(00)12345-6789"
         };
+        await sellerController.CreateSeller(createFirstSellerDto);
 
         var createSecondSellerDto = new CreateSellerDto
         {
@@ -99,7 +86,7 @@ public class SellerUnitTest
             Telephone = "+00(00)12345-6789"
         };
 
-        await sellerController.CreateSeller(createFirstSellerDto);
+        // Act
         var actionResult = await sellerController.CreateSeller(createSecondSellerDto);
 
         // Assert
@@ -124,16 +111,8 @@ public class SellerUnitTest
         string sellerTelephone)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
+        var (_, _, sellerController, _, _) = SellerSetupUtils.SimpleSetupTestEnvironment();
 
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        // Act
         var createSellerDto = new CreateSellerDto
         {
             Cpf = sellerCpf,
@@ -141,59 +120,19 @@ public class SellerUnitTest
             Name = sellerName,
             Telephone = sellerTelephone
         };
+
+        // Act
         var actionResult = await sellerController.CreateSeller(createSellerDto);
 
         // Assert
         Assert.True(actionResult is CreatedResult);
     }
 
-    [Theory]
-    [InlineData(
-        "123.456.789-01",
-        "johndoe@email.com",
-        "John Doe",
-        "+00(00)12345-6789")]
-    public async void Delete_Seller_Should_Return_Unauthorized(
-        string sellerCpf,
-        string sellerEmail,
-        string sellerName,
-        string sellerTelephone)
+    [Fact]
+    public async void Delete_Seller_Should_Return_Unauthorized()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-
-        var sellerService = new SellerService(sellerRepository);
-        var loginService = new LoginService(sellerRepository);
-
-        var tokenController = new TokenController(loginService);
-        var sellerController = new SellerController(sellerService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = sellerCpf,
-            Email = sellerEmail,
-            Name = sellerName,
-            Telephone = sellerTelephone
-        };
-
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _, sellerController, _, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         // Act
         var actionResult = await sellerController.DeleteSeller(Guid.NewGuid());
@@ -202,39 +141,14 @@ public class SellerUnitTest
         Assert.True(actionResult is UnauthorizedResult);
     }
 
-    [Theory]
-    [InlineData(
-        "123.456.789-01",
-        "johndoe@email.com",
-        "John Doe",
-        "+00(00)12345-6789")]
-    public async void Delete_Seller_Should_Return_BadRequest(
-        string sellerCpf,
-        string sellerEmail,
-        string sellerName,
-        string sellerTelephone)
+    [Fact]
+    public async void Delete_Seller_Should_Return_BadRequest()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-
-        var sellerController = new SellerController(sellerService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = sellerCpf,
-            Email = sellerEmail,
-            Name = sellerName,
-            Telephone = sellerTelephone
-        };
-
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
+        var (_, sellerService,
+            sellerController,
+            createdSeller, _, _,
+            claims) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var claimsArray = new Claim[]
         {
@@ -257,7 +171,7 @@ public class SellerUnitTest
             expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: credentials);
 
-        var claims = new JwtSecurityTokenHandler()
+        claims = new JwtSecurityTokenHandler()
             .ReadJwtToken(new JwtSecurityTokenHandler().WriteToken(encryptedToken))
             .Claims;
 
@@ -270,109 +184,29 @@ public class SellerUnitTest
         Assert.True(actionResult is BadRequestResult);
     }
 
-    [Theory]
-    [InlineData(
-        "123.456.789-01",
-        "johndoe@email.com",
-        "John Doe",
-        "+00(00)12345-6789")]
-    public async void Delete_Seller_Should_Return_NotFound(
-        string sellerCpf,
-        string sellerEmail,
-        string sellerName,
-        string sellerTelephone)
+    [Fact]
+    public async void Delete_Seller_Should_Return_NotFound()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-
-        var sellerService = new SellerService(sellerRepository);
-        var loginService = new LoginService(sellerRepository);
-
-        var tokenController = new TokenController(loginService);
-        var sellerController = new SellerController(sellerService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = sellerCpf,
-            Email = sellerEmail,
-            Name = sellerName,
-            Telephone = sellerTelephone
-        };
-
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
+        await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
 
         // Act
-        await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
         var actionResult = await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
 
         // Assert
         Assert.True(actionResult is NotFoundResult);
     }
 
-    [Theory]
-    [InlineData(
-        "123.456.789-01",
-        "johndoe@email.com",
-        "John Doe",
-        "+00(00)12345-6789")]
-    public async void Delete_Seller_Should_Return_Ok(
-        string sellerCpf,
-        string sellerEmail,
-        string sellerName,
-        string sellerTelephone)
+    [Fact]
+    public async void Delete_Seller_Should_Return_Ok()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-
-        var sellerService = new SellerService(sellerRepository);
-        var loginService = new LoginService(sellerRepository);
-
-        var tokenController = new TokenController(loginService);
-        var sellerController = new SellerController(sellerService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = sellerCpf,
-            Email = sellerEmail,
-            Name = sellerName,
-            Telephone = sellerTelephone
-        };
-
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         // Act
         var actionResult = await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
@@ -381,93 +215,30 @@ public class SellerUnitTest
         Assert.True(actionResult is OkResult);
     }
 
-    [Theory]
-    [InlineData(
-        "123.456.789-01",
-        "johndoe@email.com",
-        "John Doe",
-        "+00(00)12345-6789")]
-    public async void Get_Seller_By_Id_Should_Return_Unauthorized(
-        string sellerCpf,
-        string sellerEmail,
-        string sellerName,
-        string sellerTelephone)
+    [Fact]
+    public async void Get_Seller_By_Id_Should_Return_Unauthorized()
     {
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-
-        var sellerService = new SellerService(sellerRepository);
-        var loginService = new LoginService(sellerRepository);
-
-        var tokenController = new TokenController(loginService);
-        var sellerController = new SellerController(sellerService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = sellerCpf,
-            Email = sellerEmail,
-            Name = sellerName,
-            Telephone = sellerTelephone
-        };
-
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        // Arrange
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
+        await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
 
         // Act
-        await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
         var actionResult = await sellerController.GetSellerById(Guid.NewGuid());
 
         // Assert
         Assert.True(actionResult is UnauthorizedResult);
     }
 
-    [Theory]
-    [InlineData(
-        "123.456.789-01",
-        "johndoe@email.com",
-        "John Doe",
-        "+00(00)12345-6789")]
-    public async void Get_Seller_By_Id_Should_Return_BadRequest(
-        string sellerCpf,
-        string sellerEmail,
-        string sellerName,
-        string sellerTelephone)
+    [Fact]
+    public async void Get_Seller_By_Id_Should_Return_BadRequest()
     {
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-
-        var sellerController = new SellerController(sellerService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = sellerCpf,
-            Email = sellerEmail,
-            Name = sellerName,
-            Telephone = sellerTelephone
-        };
-
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
+        // Arrange
+        var (_, sellerService,
+            sellerController,
+            createdSeller, _, _,
+            claims) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var claimsArray = new Claim[]
         {
@@ -490,121 +261,43 @@ public class SellerUnitTest
             expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: credentials);
 
-        var claims = new JwtSecurityTokenHandler()
+        claims = new JwtSecurityTokenHandler()
             .ReadJwtToken(new JwtSecurityTokenHandler().WriteToken(encryptedToken))
             .Claims;
 
         sellerController = new SellerController(sellerService, claims);
+        await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
 
         // Act
-        await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
         var actionResult = await sellerController.GetSellerById(Guid.NewGuid());
 
         // Assert
         Assert.True(actionResult is BadRequestResult);
     }
 
-    [Theory]
-    [InlineData(
-        "123.456.789-01",
-        "johndoe@email.com",
-        "John Doe",
-        "+00(00)12345-6789")]
-    public async void Get_Seller_By_Id_Should_Return_NotFound(
-        string sellerCpf,
-        string sellerEmail,
-        string sellerName,
-        string sellerTelephone)
+    [Fact]
+    public async void Get_Seller_By_Id_Should_Return_NotFound()
     {
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-
-        var sellerService = new SellerService(sellerRepository);
-        var loginService = new LoginService(sellerRepository);
-
-        var tokenController = new TokenController(loginService);
-        var sellerController = new SellerController(sellerService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = sellerCpf,
-            Email = sellerEmail,
-            Name = sellerName,
-            Telephone = sellerTelephone
-        };
-
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        // Arrange
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
+        await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
 
         // Act
-        await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
         var actionResult = await sellerController.GetSellerById(createdSeller?.Id ?? Guid.Empty);
 
         // Assert
         Assert.True(actionResult is NotFoundResult);
     }
 
-    [Theory]
-    [InlineData(
-        "123.456.789-01",
-        "johndoe@email.com",
-        "John Doe",
-        "+00(00)12345-6789")]
-    public async void Get_Seller_By_Id_Should_Return_Ok(
-        string sellerCpf,
-        string sellerEmail,
-        string sellerName,
-        string sellerTelephone)
+    [Fact]
+    public async void Get_Seller_By_Id_Should_Return_Ok()
     {
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-
-        var sellerService = new SellerService(sellerRepository);
-        var loginService = new LoginService(sellerRepository);
-
-        var tokenController = new TokenController(loginService);
-        var sellerController = new SellerController(sellerService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = sellerCpf,
-            Email = sellerEmail,
-            Name = sellerName,
-            Telephone = sellerTelephone
-        };
-
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        // Arrange
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         // Act
         var actionResult = await sellerController.GetSellerById(createdSeller?.Id ?? Guid.Empty);
@@ -626,38 +319,7 @@ public class SellerUnitTest
         string newSellerTelephone)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _, sellerController, _, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -683,38 +345,9 @@ public class SellerUnitTest
     public async void Update_Seller_Cpf_By_Id_Should_Return_BadRequest(string newSellerCpf)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerCpf}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -736,38 +369,9 @@ public class SellerUnitTest
     public async void Update_Seller_Email_By_Id_Should_Return_BadRequest(string newSellerEmail)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerEmail}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -786,38 +390,9 @@ public class SellerUnitTest
     public async void Update_Seller_Name_By_Id_Should_Return_BadRequest(string newSellerName)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerName}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -841,39 +416,9 @@ public class SellerUnitTest
     public async void Update_Seller_Telephone_By_Id_Should_Return_BadRequest(string newSellerTelephone)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(
-                $"{MethodBase.GetCurrentMethod()!.Name}{newSellerTelephone}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -892,44 +437,14 @@ public class SellerUnitTest
     public async void Update_Seller_Any_Value_By_Id_Should_Return_NotFound(string newSellerTelephone)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerTelephone}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
             Telephone = newSellerTelephone
         };
-
         await sellerController.DeleteSeller(createdSeller?.Id ?? Guid.Empty);
 
         // Act
@@ -952,38 +467,9 @@ public class SellerUnitTest
         string newSellerTelephone)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase(MethodBase.GetCurrentMethod()!.Name)
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -1007,38 +493,9 @@ public class SellerUnitTest
     public async void Update_Seller_Cpf_By_Id_Should_Return_Ok(string newSellerCpf)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerCpf}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -1059,38 +516,9 @@ public class SellerUnitTest
     public async void Update_Seller_Email_By_Id_Should_Return_Ok(string newSellerEmail)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerEmail}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -1111,38 +539,9 @@ public class SellerUnitTest
     public async void Update_Seller_Name_By_Id_Should_Return_Ok(string newSellerName)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerName}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
@@ -1163,38 +562,9 @@ public class SellerUnitTest
     public async void Update_Seller_Telephone_By_Id_Should_Return_Ok(string newSellerTelephone)
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<EcommerceContext>()
-            .UseInMemoryDatabase($"{MethodBase.GetCurrentMethod()!.Name}{newSellerTelephone}")
-            .Options;
-        await using var dbContext = new EcommerceContext(options);
-
-        var sellerRepository = new SellerRepository(dbContext);
-        var sellerService = new SellerService(sellerRepository);
-        var sellerController = new SellerController(sellerService);
-
-        var loginService = new LoginService(sellerRepository);
-        var tokenController = new TokenController(loginService);
-
-        var createSellerDto = new CreateSellerDto
-        {
-            Cpf = "123.456.789-01",
-            Email = "johndoe@email.com",
-            Name = "John Doe",
-            Telephone = "+00(00)12345-6789"
-        };
-        var createdSeller = (await sellerController.CreateSeller(createSellerDto) as CreatedResult)
-            ?.Value as SellerDto?;
-
-        var loginDto = new LoginDto
-        {
-            Cpf = createdSeller?.Cpf ?? string.Empty,
-            Email = createdSeller?.Email ?? string.Empty
-        };
-
-        var jwt = (await tokenController.GenerateJwt(loginDto) as CreatedResult)?.Value as string;
-        var claims = new JwtSecurityTokenHandler().ReadJwtToken(jwt).Claims;
-
-        sellerController = new SellerController(sellerService, claims);
+        var (_, _,
+            sellerController,
+            createdSeller, _, _, _) = await SellerSetupUtils.ExistingSellerSetupTestEnvironment();
 
         var updateSellerDto = new UpdateSellerDto
         {
